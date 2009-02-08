@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phone_types>
+{% for phone_type in phone_types %}
+    <phone_type>
+        <data>{{ phone_type.0 }}</data>
+        <label>{{ phone_type.1 }}</label>
+    </phone_type>
+{% endfor %}
+</phone_types>

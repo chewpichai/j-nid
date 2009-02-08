@@ -1,0 +1,9 @@
+INSERT INTO phone_numbers(person_id, number, type) VALUES(1, '0000000000', 'mobile');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(1, '1000000000', 'home');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(1, '0100000000', 'fax');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(2, '0010000000', 'home');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(2, '0001000000', 'mobile');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(2, '0000100000', 'mobile');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(3, '0000010000', 'mobile');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(3, '0000001000', 'fax');
+INSERT INTO phone_numbers(person_id, number, type) VALUES(3, '0000000100', 'mobile');
