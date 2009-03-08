@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<banks>
-{% for bank in banks %}
-    <bank>
-        <data>{{ bank.0 }}</data>
-        <label>{{ bank.1 }}</label>
-    </bank>
-{% endfor %}
-</banks>

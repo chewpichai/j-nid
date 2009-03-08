@@ -1,8 +1,0 @@
-<product>
-    <id>{{ product.id }}</id>
-    <name>{{ product.name }}</name>
-    <type>{{ product.type.id }}</type>
-    <unit>{{ product.unit }}</unit>
-    <pricePerUnit>{{ product.price_per_unit }}</pricePerUnit>
-    <isSale>{{ product.is_sale|yesno:"1,0" }}</isSale>
-</product>

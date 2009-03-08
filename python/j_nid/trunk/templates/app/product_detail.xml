@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<response>
-    {% include "app/_product.xml" %}
-</response>
