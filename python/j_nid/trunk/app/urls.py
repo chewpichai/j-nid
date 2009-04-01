@@ -6,10 +6,11 @@ from j_nid.app import views
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^banks/$', views.get_banks),
+    (r'^banknames/$', views.get_banks),
     (r'^bankaccounts/$', views.BankAccountController()),
     (r'^orders/$', views.OrderController()),
     (r'^orderitems/$', views.OrderItemController()),
+    (r'^payments/$', views.PaymentController()),
     (r'^people/$', views.PersonController()),
     (r'^people/(?P<id>\d+)/$', views.PersonController()),
     (r'^phonenumbers/$', views.PhoneNumberController()),

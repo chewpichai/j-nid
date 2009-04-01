@@ -1,17 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext as _
 
-class PersonManager(models.Manager):
-    def get_query_set(self):
-        return super(PersonManager, self).get_query_set().extra(
-            select={'num_outstanding_orders': 
-                'SELECT COUNT(*) FROM orders WHERE person_id = people.id AND status = 0',
-                'outstanding_order_total':
-                """SELECT SUM(price_per_unit * unit) FROM order_items WHERE order_id IN 
-                (SELECT id FROM orders WHERE person_id = people.id AND status = 0)""",
-            }
-        )
-
 class Person(models.Model):
     name = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255, null=True, blank=True, default='')
@@ -20,14 +9,12 @@ class Person(models.Model):
     address = models.TextField(null=True, blank=True, default='')
     detail1 = models.TextField(null=True, blank=True, default='')
     detail2 = models.TextField(null=True, blank=True, default='')
-    objects = PersonManager()
     
     def __unicode__(self):
         return u'%s' % self.name
         
     class Meta:
         db_table = 'people'
-        ordering = ['name']
 
 class BankAccount(models.Model):
     BANK_CHOICES = (
@@ -73,19 +60,20 @@ class Payment(models.Model):
         
 class ProductType(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    color = models.PositiveIntegerField()
     
     def __unicode__(self):
         return u'%s' % self.name
     
     class Meta:
         db_table = 'product_types'
-        ordering = ['name']
         verbose_name = 'product_type'
     
 class Product(models.Model):
     name = models.CharField(max_length=255)
     type = models.ForeignKey(ProductType, db_column='type', related_name='products')
     unit = models.PositiveIntegerField()
+    cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     is_sale = models.BooleanField()
     
@@ -94,16 +82,7 @@ class Product(models.Model):
     
     class Meta:
         db_table = 'products'
-        ordering = ['type', 'name']
         unique_together = ('name', 'type')
-        
-class OrderManager(models.Manager):
-    def get_query_set(self):
-        return super(OrderManager, self).get_query_set().extra(
-            select={'total': 
-                'SELECT SUM(price_per_unit * unit) FROM order_items WHERE order_id = orders.id'
-            }
-        )
         
 class Order(models.Model):
     STATUS_OPTIONS = (
@@ -116,7 +95,6 @@ class Order(models.Model):
     notation = models.TextField(null=True, blank=True, default='')
     status = models.IntegerField(choices=STATUS_OPTIONS)
     created = models.DateTimeField(auto_now_add=True)
-    objects = OrderManager()
     
     def __unicode__(self):
         return u'Order for %s' % self.person.name
@@ -124,18 +102,12 @@ class Order(models.Model):
     class Meta:
         db_table = 'orders'
         
-class OrderItemManager(models.Manager):
-    def get_query_set(self):
-        return super(OrderItemManager, self).get_query_set().extra(
-            select={'total': 'price_per_unit * unit'}
-        )
-        
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='order_items')
     product = models.ForeignKey(Product, related_name='order_items')
+    cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=7, decimal_places=2)
     unit = models.PositiveIntegerField()
-    objects = OrderItemManager()
     
     def __unicode__(self):
         return u'OrderItem %s' % self.product.name

@@ -2,7 +2,6 @@ from django.db import models, IntegrityError
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import render_to_response
 from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 from j_nid.app.models import *
@@ -12,12 +11,32 @@ from xml.parsers.expat import ExpatError
 import datetime
 
 def get_banks(request):
-    return render_to_response('app/bank_list.xml', {'banks': BankAccount.BANK_CHOICES},
-                mimetype="application/xml")
+    impl = getDOMImplementation()
+    doc = impl.createDocument(None, 'banks', None)
+    for data, label in BankAccount.BANK_CHOICES:
+        elm = doc.createElement('bank')
+        labelEml = doc.createElement('label')
+        dataEml = doc.createElement('data')
+        labelEml.appendChild(doc.createTextNode(u'%s' % label))
+        dataEml.appendChild(doc.createTextNode(u'%s' % data))
+        elm.appendChild(labelEml)
+        elm.appendChild(dataEml)
+        doc.documentElement.appendChild(elm)
+    return HttpResponse(doc.toxml('utf-8'), mimetype="application/xml")
     
 def get_phonetypes(request):
-    return render_to_response('app/phonetype_list.xml', {'phone_types': PhoneNumber.TYPE_CHOICES},
-                mimetype="application/xml")
+    impl = getDOMImplementation()
+    doc = impl.createDocument(None, 'phone_types', None)
+    for data, label in PhoneNumber.TYPE_CHOICES:
+        elm = doc.createElement('phone_type')
+        labelEml = doc.createElement('label')
+        dataEml = doc.createElement('data')
+        labelEml.appendChild(doc.createTextNode(u'%s' % label))
+        dataEml.appendChild(doc.createTextNode(u'%s' % data))
+        elm.appendChild(labelEml)
+        elm.appendChild(dataEml)
+        doc.documentElement.appendChild(elm)
+    return HttpResponse(doc.toxml('utf-8'), mimetype="application/xml")
 
 def update_model(model, xml):
     for field in model._meta.fields:
@@ -159,3 +178,13 @@ class PhoneNumberController(Controller):
     def do_GET(self):
         phone_numbers = PhoneNumber.objects.all()
         return response_xml(phone_numbers)
+        
+class PaymentController(Controller):
+    def do_GET(self):
+        payments = Payment.objects.all()
+        return response_xml(payments)
+        
+    def do_POST(self):
+        payment = Payment()
+        update_model(payment, self.xml.payment)
+        return response_xml(payment)
