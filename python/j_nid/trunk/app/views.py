@@ -114,6 +114,11 @@ class ProductTypeController(Controller):
         except IntegrityError: return HttpResponse(error_xml('Product type already exist.'),
                                         mimetype="application/xml")
         return response_xml(product_type)
+        
+    def do_PUT(self, id):
+        product_type = ProductType.objects.get(id=id)
+        update_model(product_type, self.xml.product_type)
+        return response_xml(product_type)
     
 class ProductController(Controller):
     def do_GET(self):

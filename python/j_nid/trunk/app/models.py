@@ -9,6 +9,7 @@ class Person(models.Model):
     address = models.TextField(null=True, blank=True, default='')
     detail1 = models.TextField(null=True, blank=True, default='')
     detail2 = models.TextField(null=True, blank=True, default='')
+    type = models.PositiveIntegerField()
     
     def __unicode__(self):
         return u'%s' % self.name
