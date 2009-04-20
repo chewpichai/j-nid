@@ -54,6 +54,7 @@ class PhoneNumber(models.Model):
 class Payment(models.Model):
     person = models.ForeignKey(Person, related_name='payments')
     amount = models.DecimalField(max_digits=9, decimal_places=2)
+    notation = models.TextField(null=True, blank=True, default='')
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
