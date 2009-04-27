@@ -81,8 +81,12 @@ def error_xml(*msgs):
     
 def response_xml(data):
     if isinstance(data, QuerySet):
-        return HttpResponse(query_set_to_xml(data).toxml('utf-8'), mimetype='application/xml')
-    return HttpResponse(model_to_xml(data).toxml('utf-8'), mimetype='application/xml')
+        return HttpResponse(
+                query_set_to_xml(data).toxml('utf-8'), 
+                mimetype='application/xml')
+    return HttpResponse(
+            model_to_xml(data).toxml('utf-8'), 
+            mimetype='application/xml')
 
 
 class Controller(object):
@@ -234,3 +238,40 @@ class PaymentController(Controller):
         payment = Payment()
         update_model(payment, self.xml.payment)
         return response_xml(payment)
+
+
+class SupplyController(Controller):
+    def do_GET(self):
+        supplies = Supply.objects.all()
+        return response_xml(supplies)
+
+    def do_POST(self):
+        supply = Supply()
+        update_model(supply, self.xml.supply)
+        return response_xml(supply)
+        
+    def do_PUT(self, id):
+        supply = Supply.objects.get(id=id)
+        update_model(supply, self.xml.supply)
+        return response_xml(supply)
+
+    def do_DELETE(self, id):
+        supply = Supply.objects.get(id=id)
+        supply.delete()
+        return response_xml(supply)
+
+
+class SupplyItemController(Controller):
+    def do_GET(self):
+        supply_items = SupplyItem.objects.all()
+        return response_xml(supply_items)
+
+    def do_POST(self):
+        supply_item = SupplyItem()
+        update_model(supply_item, self.xml.supply_item)
+        return response_xml(supply_item)
+
+    def do_DELETE(self, id):
+        supply_item = SupplyItem.objects.get(id=id)
+        supply_item.delete()
+        return response_xml(supply_item)

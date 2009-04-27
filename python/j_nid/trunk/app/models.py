@@ -117,3 +117,27 @@ class OrderItem(models.Model):
     class Meta:
         db_table = 'order_items'
         verbose_name = 'order_item'
+		
+class Supply(models.Model):
+    person = models.ForeignKey(Person, related_name='supplies')
+    notation = models.TextField(null=True, blank=True, default='')
+    created = models.DateTimeField(auto_now_add=True)
+    
+    def __unicode__(self):
+        return u'Supply for %s' % self.person.name
+    
+    class Meta:
+        db_table = 'supplies'
+        
+class SupplyItem(models.Model):
+    supply = models.ForeignKey(Order, related_name='supply_items')
+    product = models.ForeignKey(Product, related_name='supply_items')
+    price_per_unit = models.DecimalField(max_digits=7, decimal_places=2)
+    unit = models.PositiveIntegerField()
+    
+    def __unicode__(self):
+        return u'SupplyItem %s' % self.product.name
+    
+    class Meta:
+        db_table = 'supply_items'
+        verbose_name = 'supply_item'
