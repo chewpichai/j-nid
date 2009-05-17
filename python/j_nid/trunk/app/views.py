@@ -222,11 +222,21 @@ class BankAccountController(Controller):
         bank_accounts = BankAccount.objects.all()
         return response_xml(bank_accounts)
 
+    def do_POST(self):
+        bank_account = BankAccount()
+        update_model(bank_account, self.xml.bank_account)
+        return response_xml(bank_account)
+
 
 class PhoneNumberController(Controller):
     def do_GET(self):
         phone_numbers = PhoneNumber.objects.all()
         return response_xml(phone_numbers)
+
+    def do_POST(self):
+        phone_number = PhoneNumber()
+        update_model(phone_number, self.xml.phone_number)
+        return response_xml(phone_number)
 
 
 class PaymentController(Controller):
