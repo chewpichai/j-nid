@@ -1,7 +1,8 @@
+from django.contrib.auth import authenticate, login, logout
 from django.db import models, IntegrityError
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import *
 from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 from j_nid.app.models import *
@@ -119,6 +120,20 @@ class Controller(object):
     def do_DELETE(self):
         pass
 
+class SessionController(Controller):
+    def do_POST(self):
+        username = self.params['username']
+        password = self.params['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            login(self.request, user)
+            return HttpResponse()
+        else:
+            return HttpResponseForbidden()
+
+    def do_DELETE(self):
+        logout(self.request)
+        return HttpResponse()
 
 class ProductTypeController(Controller):
     def do_GET(self):
