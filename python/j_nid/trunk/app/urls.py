@@ -8,6 +8,7 @@ from j_nid.app import views
 urlpatterns = patterns('',
     (r'^banknames/$', views.get_banks),
     (r'^bankaccounts/$', views.BankAccountController()),
+    (r'^sessions/$', views.SessionController()),
     (r'^orders/$', views.OrderController()),
     (r'^orders/(?P<id>\d+)/$', views.OrderController()),
     (r'^orderitems/$', views.OrderItemController()),

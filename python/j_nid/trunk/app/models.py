@@ -3,9 +3,12 @@ from django.utils.translation import ugettext as _
 
 class Person(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=255, null=True, blank=True, default='')
-    last_name = models.CharField(max_length=255, null=True, blank=True, default='')
-    id_card_number = models.CharField(max_length=13, null=True, blank=True, default='')
+    first_name = models.CharField(max_length=255, null=True, blank=True,
+                            default='')
+    last_name = models.CharField(max_length=255, null=True, blank=True,
+                            default='')
+    id_card_number = models.CharField(max_length=13, null=True, blank=True,
+                            default='')
     address = models.TextField(null=True, blank=True, default='')
     detail1 = models.TextField(null=True, blank=True, default='')
     detail2 = models.TextField(null=True, blank=True, default='')
@@ -44,7 +47,7 @@ class PhoneNumber(models.Model):
         ('office', _('Office'))
     )
     
-    person = models.ForeignKey(Person, related_name='phone_numbers')    
+    person = models.ForeignKey(Person, related_name='phone_numbers')
     number = models.CharField(max_length=20)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     
@@ -79,7 +82,8 @@ class ProductType(models.Model):
     
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    type = models.ForeignKey(ProductType, db_column='type', related_name='products')
+    type = models.ForeignKey(ProductType, db_column='type',
+                        related_name='products')
     unit = models.PositiveIntegerField()
     cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)

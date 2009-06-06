@@ -83,11 +83,11 @@ def error_xml(*msgs):
 def response_xml(data):
     if isinstance(data, QuerySet):
         return HttpResponse(
-                query_set_to_xml(data).toxml('utf-8'), 
-                mimetype='application/xml')
+                    query_set_to_xml(data).toxml('utf-8'), 
+                    mimetype='application/xml')
     return HttpResponse(
-            model_to_xml(data).toxml('utf-8'), 
-            mimetype='application/xml')
+                model_to_xml(data).toxml('utf-8'), 
+                mimetype='application/xml')
 
 
 class Controller(object):
@@ -122,8 +122,8 @@ class Controller(object):
 
 class SessionController(Controller):
     def do_POST(self):
-        username = self.params['username']
-        password = self.params['password']
+        username = self.xml.user.username[0].value
+        password = self.xml.user.password[0].value
         user = authenticate(username=username, password=password)
         if user:
             login(self.request, user)
@@ -146,7 +146,7 @@ class ProductTypeController(Controller):
             update_model(product_type, self.xml.product_type)
         except IntegrityError:
             return HttpResponse(error_xml('Product type already exist.'),
-                    mimetype="application/xml")
+                        mimetype="application/xml")
         return response_xml(product_type)
         
     def do_PUT(self, id):
@@ -166,7 +166,7 @@ class ProductController(Controller):
             update_model(product, self.xml.product)
         except IntegrityError:
             return HttpResponse(error_xml('Product already exist.'),
-                    mimetype="application/xml")
+                        mimetype="application/xml")
         return response_xml(product)
         
     def do_PUT(self, id):
@@ -186,7 +186,7 @@ class PersonController(Controller):
             update_model(person, self.xml.person)
         except IntegrityError:
             return HttpResponse(error_xml('Person already exist.'),
-                    mimetype="application/xml")
+                        mimetype="application/xml")
         return response_xml(person)
                         
     def do_PUT(self, id):
