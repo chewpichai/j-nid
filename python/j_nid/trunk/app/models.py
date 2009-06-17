@@ -4,11 +4,11 @@ from django.utils.translation import ugettext as _
 class Person(models.Model):
     name = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255, null=True, blank=True,
-                            default='')
+                    default='')
     last_name = models.CharField(max_length=255, null=True, blank=True,
-                            default='')
+                    default='')
     id_card_number = models.CharField(max_length=13, null=True, blank=True,
-                            default='')
+                        default='')
     address = models.TextField(null=True, blank=True, default='')
     detail1 = models.TextField(null=True, blank=True, default='')
     detail2 = models.TextField(null=True, blank=True, default='')
@@ -138,7 +138,7 @@ class Supply(models.Model):
 
 
 class SupplyItem(models.Model):
-    supply = models.ForeignKey(Order, related_name='supply_items')
+    supply = models.ForeignKey(Supply, related_name='supply_items')
     product = models.ForeignKey(Product, related_name='supply_items')
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     unit = models.PositiveIntegerField()

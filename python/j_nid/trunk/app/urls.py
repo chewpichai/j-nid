@@ -1,36 +1,26 @@
 from django.conf.urls.defaults import *
 from j_nid.app import views
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
-
 urlpatterns = patterns('',
-    (r'^banknames/$', views.get_banks),
-    (r'^bankaccounts/$', views.BankAccountController()),
-    (r'^sessions/$', views.SessionController()),
-    (r'^orders/$', views.OrderController()),
-    (r'^orders/(?P<id>\d+)/$', views.OrderController()),
-    (r'^orderitems/$', views.OrderItemController()),
-    (r'^orderitems/(?P<id>\d+)/$', views.OrderItemController()),
-	(r'^supplies/$', views.SupplyController()),
-    (r'^supplies/(?P<id>\d+)/$', views.SupplyController()),
-    (r'^supplyitems/$', views.SupplyItemController()),
-    (r'^supplyitems/(?P<id>\d+)/$', views.SupplyItemController()),
-    (r'^payments/$', views.PaymentController()),
-    (r'^people/$', views.PersonController()),
-    (r'^people/(?P<id>\d+)/$', views.PersonController()),
-    (r'^phonenumbers/$', views.PhoneNumberController()),
-    (r'^phonetypes/$', views.get_phonetypes),
-    (r'^producttypes/$', views.ProductTypeController()),
-    (r'^producttypes/(?P<id>\d+)/$', views.ProductTypeController()),
-    (r'^products/$', views.ProductController()),
-    (r'^products/(?P<id>\d+)/$', views.ProductController()),
-
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # (r'^admin/(.*)', admin.site.root),
+    url(r'^banknames/$', views.get_banks),
+    url(r'^bankaccounts/$', views.BankAccountController()),
+    url(r'^sessions/$', views.SessionController()),
+    url(r'^orders/$', views.OrderController()),
+    url(r'^orders/(?P<id>\d+)/$', views.OrderController(), name='jn_order_detail'),
+    url(r'^orderitems/$', views.OrderItemController()),
+    url(r'^orderitems/(?P<id>\d+)/$', views.OrderItemController()),
+	url(r'^supplies/$', views.SupplyController()),
+    url(r'^supplies/(?P<id>\d+)/$', views.SupplyController()),
+    url(r'^supplyitems/$', views.SupplyItemController()),
+    url(r'^supplyitems/(?P<id>\d+)/$', views.SupplyItemController()),
+    url(r'^payments/$', views.PaymentController()),
+    url(r'^payments/(?P<id>\d+)/$', views.PaymentController()),
+    url(r'^people/$', views.PersonController()),
+    url(r'^people/(?P<id>\d+)/$', views.PersonController()),
+    url(r'^phonenumbers/$', views.PhoneNumberController()),
+    url(r'^phonetypes/$', views.get_phonetypes),
+    url(r'^producttypes/$', views.ProductTypeController()),
+    url(r'^producttypes/(?P<id>\d+)/$', views.ProductTypeController()),
+    url(r'^products/$', views.ProductController()),
+    url(r'^products/(?P<id>\d+)/$', views.ProductController()),
 )

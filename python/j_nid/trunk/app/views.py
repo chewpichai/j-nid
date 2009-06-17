@@ -6,7 +6,7 @@ from django.http import *
 from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 from j_nid.app.models import *
-from p4x import P4X
+from j_nid.p4x import P4X
 from xml.dom.minidom import getDOMImplementation
 from xml.parsers.expat import ExpatError
 import datetime
@@ -41,16 +41,15 @@ def get_phonetypes(request):
 
 def update_model(model, xml):
     for field in model._meta.fields:
-        name = field.attname
         try:
-            value = getattr(xml, name)[0].value
+            value = getattr(xml, field.attname)[0].value
             if isinstance(field, models.BooleanField):
                 value = int(value)
             elif isinstance(field, models.CharField):
                 value = value or ''
             elif isinstance(field, models.TextField):
                 value = value or ''
-            setattr(model, name, value)
+            setattr(model, field.attname, value)
         except TypeError:
             continue
     model.save()
@@ -97,7 +96,7 @@ class Controller(object):
         method = request.method
         if request.raw_post_data:
             try:
-                self.xml = P4X(self.request.raw_post_data)
+                self.xml = P4X(request.raw_post_data)
                 if self.xml.method:
                     method = self.xml.method[0].value
             except ExpatError:
@@ -120,6 +119,7 @@ class Controller(object):
     def do_DELETE(self):
         pass
 
+
 class SessionController(Controller):
     def do_POST(self):
         username = self.xml.user.username[0].value
@@ -134,6 +134,7 @@ class SessionController(Controller):
     def do_DELETE(self):
         logout(self.request)
         return HttpResponse()
+
 
 class ProductTypeController(Controller):
     def do_GET(self):
@@ -187,7 +188,26 @@ class PersonController(Controller):
         except IntegrityError:
             return HttpResponse(error_xml('Person already exist.'),
                         mimetype="application/xml")
-        return response_xml(person)
+        if self.xml.person.bank_accounts:
+            for ba in self.xml.person.bank_accounts.bank_account:
+                bank_account = BankAccount()
+                update_model(bank_account, ba)
+                person.bank_accounts.add(bank_account)
+        if self.xml.person.phone_numbers:
+            for number in self.xml.person.phone_numbers.phone_number:
+                phone_number = PhoneNumber()
+                update_model(phone_number, number)
+                person.phone_numbers.add(phone_number)
+        doc = model_to_xml(person)
+        elm = doc.createElement('bank_accounts')
+        for account in person.bank_accounts.all():
+            elm.appendChild(model_to_xml(account).documentElement)
+        doc.documentElement.appendChild(elm)
+        elm = doc.createElement('phone_numbers')
+        for number in person.phone_numbers.all():
+            elm.appendChild(model_to_xml(number).documentElement)
+        doc.documentElement.appendChild(elm)
+        return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
                         
     def do_PUT(self, id):
         person = Person.objects.get(id=id)
@@ -203,7 +223,16 @@ class OrderController(Controller):
     def do_POST(self):
         order = Order()
         update_model(order, self.xml.order)
-        return response_xml(order)
+        for item in self.xml.order.order_items.order_item:
+            order_item = OrderItem()
+            update_model(order_item, item)
+            order.order_items.add(order_item)
+        doc = model_to_xml(order)
+        elm = doc.createElement('order_items')
+        for item in order.order_items.all():
+            elm.appendChild(model_to_xml(item).documentElement)
+        doc.documentElement.appendChild(elm)
+        return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
         
     def do_PUT(self, id):
         order = Order.objects.get(id=id)
@@ -213,7 +242,7 @@ class OrderController(Controller):
     def do_DELETE(self, id):
         order = Order.objects.get(id=id)
         order.delete()
-        return response_xml(order)
+        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 
 class OrderItemController(Controller):
@@ -229,7 +258,7 @@ class OrderItemController(Controller):
     def do_DELETE(self, id):
         order_item = OrderItem.objects.get(id=id)
         order_item.delete()
-        return response_xml(order_item)
+        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 
 class BankAccountController(Controller):
@@ -264,6 +293,11 @@ class PaymentController(Controller):
         update_model(payment, self.xml.payment)
         return response_xml(payment)
 
+    def do_DELETE(self, id):
+        payment = Payment.objects.get(id=id)
+        payment.delete()
+        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
+
 
 class SupplyController(Controller):
     def do_GET(self):
@@ -273,7 +307,16 @@ class SupplyController(Controller):
     def do_POST(self):
         supply = Supply()
         update_model(supply, self.xml.supply)
-        return response_xml(supply)
+        for item in self.xml.supply.supply_items.supply_item:
+            supply_item = SupplyItem()
+            update_model(supply_item, item)
+            supply.supply_items.add(supply_item)
+        doc = model_to_xml(supply)
+        elm = doc.createElement('supply_items')
+        for item in supply.supply_items.all():
+            elm.appendChild(model_to_xml(item).documentElement)
+        doc.documentElement.appendChild(elm)
+        return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
         
     def do_PUT(self, id):
         supply = Supply.objects.get(id=id)
@@ -283,7 +326,7 @@ class SupplyController(Controller):
     def do_DELETE(self, id):
         supply = Supply.objects.get(id=id)
         supply.delete()
-        return response_xml(supply)
+        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 
 class SupplyItemController(Controller):
@@ -299,4 +342,4 @@ class SupplyItemController(Controller):
     def do_DELETE(self, id):
         supply_item = SupplyItem.objects.get(id=id)
         supply_item.delete()
-        return response_xml(supply_item)
+        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
