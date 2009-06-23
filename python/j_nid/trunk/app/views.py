@@ -105,7 +105,9 @@ class Controller(object):
             callback = getattr(self, 'do_%s' % method)
         except AttributeError:
             return HttpResponseNotFound()
-        return callback(**kwargs)
+        response = callback(**kwargs)
+        response.content_type = 'application/xml'
+        return response
 
     def do_GET(self):
         pass
@@ -271,6 +273,11 @@ class BankAccountController(Controller):
         update_model(bank_account, self.xml.bank_account)
         return response_xml(bank_account)
 
+    def do_DELETE(self, id):
+        bank_account = BankAccount.objects.get(id=id)
+        bank_account.delete()
+        return HttpResponse('<id>%s</id>' % id)
+
 
 class PhoneNumberController(Controller):
     def do_GET(self):
@@ -281,6 +288,11 @@ class PhoneNumberController(Controller):
         phone_number = PhoneNumber()
         update_model(phone_number, self.xml.phone_number)
         return response_xml(phone_number)
+
+    def do_DELETE(self, id):
+        phone_number = PhoneNumber.objects.get(id=id)
+        phone_number.delete()
+        return HttpResponse('<id>%s</id>' % id)
 
 
 class PaymentController(Controller):
