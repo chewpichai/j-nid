@@ -256,6 +256,11 @@ class OrderItemController(Controller):
         order_item = OrderItem()
         update_model(order_item, self.xml.order_item)
         return response_xml(order_item)
+        
+    def do_PUT(self, id):
+        order_item = OrderItem.objects.get(id=id)
+        update_model(order_item, self.xml.order_item)
+        return response_xml(order_item)
 
     def do_DELETE(self, id):
         order_item = OrderItem.objects.get(id=id)
@@ -270,6 +275,11 @@ class BankAccountController(Controller):
 
     def do_POST(self):
         bank_account = BankAccount()
+        update_model(bank_account, self.xml.bank_account)
+        return response_xml(bank_account)
+        
+    def do_PUT(self):
+        bank_account = BankAccount.objects.get(id=id)
         update_model(bank_account, self.xml.bank_account)
         return response_xml(bank_account)
 
@@ -288,6 +298,11 @@ class PhoneNumberController(Controller):
         phone_number = PhoneNumber()
         update_model(phone_number, self.xml.phone_number)
         return response_xml(phone_number)
+        
+    def do_POST(self, id):
+        phone_number = PhoneNumber.objects.get(id=id)
+        update_model(phone_number, self.xml.phone_number)
+        return response_xml(phone_number)
 
     def do_DELETE(self, id):
         phone_number = PhoneNumber.objects.get(id=id)
@@ -302,6 +317,11 @@ class PaymentController(Controller):
         
     def do_POST(self):
         payment = Payment()
+        update_model(payment, self.xml.payment)
+        return response_xml(payment)
+        
+    def do_PUT(self, id):
+        payment = Payment.objects.get(id=id)
         update_model(payment, self.xml.payment)
         return response_xml(payment)
 
@@ -348,6 +368,11 @@ class SupplyItemController(Controller):
 
     def do_POST(self):
         supply_item = SupplyItem()
+        update_model(supply_item, self.xml.supply_item)
+        return response_xml(supply_item)
+        
+    def do_PUT(self, id):
+        supply_item = SupplyItem.objects.get(id=id)
         update_model(supply_item, self.xml.supply_item)
         return response_xml(supply_item)
 
