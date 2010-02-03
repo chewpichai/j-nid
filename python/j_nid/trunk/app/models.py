@@ -1,17 +1,15 @@
 from django.db import models
 from django.utils.translation import ugettext as _
 
+
 class Person(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=255, null=True, blank=True,
-                    default='')
-    last_name = models.CharField(max_length=255, null=True, blank=True,
-                    default='')
-    id_card_number = models.CharField(max_length=13, null=True, blank=True,
-                        default='')
-    address = models.TextField(null=True, blank=True, default='')
-    detail1 = models.TextField(null=True, blank=True, default='')
-    detail2 = models.TextField(null=True, blank=True, default='')
+    first_name = models.CharField(max_length=255, blank=True, default='')
+    last_name = models.CharField(max_length=255, blank=True, default='')
+    id_card_number = models.CharField(max_length=13, blank=True, default='')
+    address = models.TextField(blank=True, default='')
+    detail1 = models.TextField(blank=True, default='')
+    detail2 = models.TextField(blank=True, default='')
     type = models.PositiveIntegerField()
     
     class Meta:
@@ -23,10 +21,10 @@ class Person(models.Model):
 
 class BankAccount(models.Model):
     BANK_CHOICES = (
-        ('BBL', _('BANGKOK BANK')),
-        ('SCB', _('SIAM COMMERCIAL BANK')),
-        ('KBANK', _('KASIKORN BANK')),
-        ('KTB', _('KRUNG THAI BANK')),
+        ('BBL', _('Bangkok Bank')),
+        ('SCB', _('Siam Commercial Bank')),
+        ('KBANK', _('Kasikorn Bank')),
+        ('KTB', _('Krung Thai Bank')),
     )
     
     person = models.ForeignKey(Person, related_name='bank_accounts')
@@ -60,7 +58,7 @@ class PhoneNumber(models.Model):
 class Payment(models.Model):
     person = models.ForeignKey(Person, related_name='payments')
     amount = models.DecimalField(max_digits=9, decimal_places=2)
-    notation = models.TextField(null=True, blank=True, default='')
+    notation = models.TextField(blank=True, default='')
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -99,8 +97,7 @@ class Product(models.Model):
 
 class Order(models.Model):
     person = models.ForeignKey(Person, related_name='orders')
-    notation = models.TextField(null=True, blank=True, default='')
-    paid_total = models.DecimalField(max_digits=9, decimal_places=2)
+    notation = models.TextField(blank=True, default='')
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -116,6 +113,7 @@ class OrderItem(models.Model):
     cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     unit = models.PositiveIntegerField()
+    is_deleted = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'order_items'
@@ -127,7 +125,7 @@ class OrderItem(models.Model):
 
 class Supply(models.Model):
     person = models.ForeignKey(Person, related_name='supplies')
-    notation = models.TextField(null=True, blank=True, default='')
+    notation = models.TextField(blank=True, default='')
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -142,6 +140,7 @@ class SupplyItem(models.Model):
     product = models.ForeignKey(Product, related_name='supply_items')
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     unit = models.PositiveIntegerField()
+    is_deleted = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'supply_items'

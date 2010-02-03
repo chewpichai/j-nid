@@ -264,7 +264,8 @@ class OrderItemController(Controller):
 
     def do_DELETE(self, id):
         order_item = OrderItem.objects.get(id=id)
-        order_item.delete()
+        order_item.is_deleted = True
+        order_item.save()
         return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 
@@ -378,5 +379,6 @@ class SupplyItemController(Controller):
 
     def do_DELETE(self, id):
         supply_item = SupplyItem.objects.get(id=id)
-        supply_item.delete()
+        supply_item.is_deleted = True
+        supply_item.save()
         return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
