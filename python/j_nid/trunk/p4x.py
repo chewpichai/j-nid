@@ -205,9 +205,8 @@ class PNode(PBase):
       for node in self.__dict__['@dom'].childNodes:
         if node.nodeName == key:
           nodes.append(PNode(node))
-      if len(nodes):
+      if nodes:
         return PList(nodes)
-
     return None
   
   def __setattr__(self, key, value):
@@ -253,10 +252,6 @@ class PNode(PBase):
       deleting = [n for n in node.childNodes if n.nodeName == key]
       for n in deleting:
         node.removeChild(n)
-  # Hack: To get value from node.      
-  def get_value(self):
-    return self.__dict__['@dom'].firstChild.nodeValue
-  value = property(get_value)
 
   def __repr__(self):
     return 'PNode(%s)' % repr(str(self.__dict__['@dom']))
