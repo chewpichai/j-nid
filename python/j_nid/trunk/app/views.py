@@ -224,7 +224,6 @@ class PersonController(Controller):
             for ba in self.xml.person.bank_accounts.bank_account:
                 bank_account = BankAccount(person=person)
                 update_model(bank_account, ba)
-        print self.xml.person.phone_numbers
         if self.xml.person.phone_numbers:
             person.phone_numbers.all().delete()
             for number in self.xml.person.phone_numbers.phone_number:
