@@ -73,10 +73,16 @@ class Controller(object):
         method = self.request.method
         self.filters = self.request.GET.get('filters')
         if self.filters:
-            self.filters = dict([f.split('=') for f in self.filters.split(',')])
+            try:
+                self.filters = dict([f.split('=') for f in self.filters.split(',')])
+            except ValueError:
+                self.filters = None
         self.attrs = self.request.GET.get('attrs')
         if self.attrs:
-            self.attrs = self.attrs.split(',')
+            try:
+                self.attrs = self.attrs.split(',')
+            except ValueError:
+                self.attrs = None
         if self.request.raw_post_data:
             try:
                 self.xml = P4X(self.request.raw_post_data)
@@ -262,16 +268,58 @@ class OrderController(Controller):
 
     def do_POST(self):
         order = Order()
+        return self.update_order(order)
+        # update_model(order, self.xml.order)
+        # for item in self.xml.order.order_items.order_item:
+            # order_item = OrderItem(order=order)
+            # update_model(order_item, item)
+        # if self.xml.order.non_pledge_baskets and self.xml.order.non_pledge_baskets.basket:
+            # for non_pledge_basket in self.xml.order.non_pledge_baskets.basket:
+                # basket = Basket.objects.get(id=toSimpleString(non_pledge_basket.id))
+                # for i in range(int(toSimpleString(non_pledge_basket.unit))):
+                    # BasketOrder.objects.create(basket=basket, order=order,
+                        # price_per_unit=toSimpleString(non_pledge_basket.price_per_unit))
+        # if self.xml.order.pledge_baskets and self.xml.order.pledge_baskets.basket:
+            # for pledge_basket in self.xml.order.pledge_baskets.basket:
+                # basket = Basket.objects.get(id=toSimpleString(pledge_basket.id))
+                # for i in range(int(toSimpleString(pledge_basket.unit))):
+                    # BasketOrder.objects.create(basket=basket, order=order, is_pledge=True,
+                        # price_per_unit=toSimpleString(pledge_basket.price_per_unit))
+        # if self.xml.order.paid:
+            # Payment.objects.create(person=order.person,
+                # amount=toSimpleString(self.xml.order.paid))
+        # doc = model_to_xml(order)
+        # elm = doc.createElement('order_items')
+        # for item in order.order_items.all():
+            # elm.appendChild(model_to_xml(item).documentElement)
+        # doc.documentElement.appendChild(elm)
+        # return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
+        
+    def do_PUT(self, id):
+        order = Order.objects.get(id=id)
+        return self.update_order(order)
+
+    def do_DELETE(self, id):
+        order = Order.objects.get(id=id)
+        order.delete()
+        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
+        
+    def update_order(self, order):
         update_model(order, self.xml.order)
         for item in self.xml.order.order_items.order_item:
-            order_item = OrderItem(order=order)
+            if item.id:
+                order_item = order.order_items.get(id=toSimpleString(item.id))
+            else:
+                order_item = OrderItem(order=order)
             update_model(order_item, item)
+        order.order_baskets.filter(is_pledge=False).delete()
         if self.xml.order.non_pledge_baskets and self.xml.order.non_pledge_baskets.basket:
             for non_pledge_basket in self.xml.order.non_pledge_baskets.basket:
                 basket = Basket.objects.get(id=toSimpleString(non_pledge_basket.id))
                 for i in range(int(toSimpleString(non_pledge_basket.unit))):
                     BasketOrder.objects.create(basket=basket, order=order,
                         price_per_unit=toSimpleString(non_pledge_basket.price_per_unit))
+        order.order_baskets.filter(is_pledge=True).delete()
         if self.xml.order.pledge_baskets and self.xml.order.pledge_baskets.basket:
             for pledge_basket in self.xml.order.pledge_baskets.basket:
                 basket = Basket.objects.get(id=toSimpleString(pledge_basket.id))
@@ -287,16 +335,6 @@ class OrderController(Controller):
             elm.appendChild(model_to_xml(item).documentElement)
         doc.documentElement.appendChild(elm)
         return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
-        
-    def do_PUT(self, id):
-        order = Order.objects.get(id=id)
-        update_model(order, self.xml.order)
-        return response_xml(order)
-
-    def do_DELETE(self, id):
-        order = Order.objects.get(id=id)
-        order.delete()
-        return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 
 class OrderItemController(Controller):
@@ -443,6 +481,10 @@ class SupplyItemController(Controller):
 class BasketController(Controller):
     def do_GET(self):
         baskets = Basket.objects.all()
+        if self.filters:
+            is_sale = self.filters.get('is_sale')
+            if is_sale:
+                baskets = baskets.filter(is_sale=bool(int(is_sale)));
         return response_xml(baskets)
         
     def do_POST(self):

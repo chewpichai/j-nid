@@ -244,6 +244,7 @@ class Basket(models.Model):
     unit = models.PositiveIntegerField()
     orders = models.ManyToManyField(Order, through='BasketOrder',
                 related_name='baskets')
+    is_sale = models.BooleanField()
 
     class Meta:
         db_table = 'baskets'
