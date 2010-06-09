@@ -9,7 +9,7 @@ from j_nid.app.models import *
 from j_nid.p4x import P4X, toSimpleString
 from xml.dom.minidom import getDOMImplementation
 from xml.parsers.expat import ExpatError
-import datetime
+import datetime, decimal
 
 def update_model(model, xml):
     for field in model._meta.fields:
@@ -254,6 +254,9 @@ class OrderController(Controller):
             return response_xml(order, self.attrs)
         orders = Order.objects.all()
         if self.filters:
+            person_id = self.filters.get('person_id')
+            if person_id:
+                orders = orders.filter(person__id=person_id)
             is_today = self.filters.get('is_today')
             if int(is_today):
                 today = datetime.date.today()
@@ -269,31 +272,6 @@ class OrderController(Controller):
     def do_POST(self):
         order = Order()
         return self.update_order(order)
-        # update_model(order, self.xml.order)
-        # for item in self.xml.order.order_items.order_item:
-            # order_item = OrderItem(order=order)
-            # update_model(order_item, item)
-        # if self.xml.order.non_pledge_baskets and self.xml.order.non_pledge_baskets.basket:
-            # for non_pledge_basket in self.xml.order.non_pledge_baskets.basket:
-                # basket = Basket.objects.get(id=toSimpleString(non_pledge_basket.id))
-                # for i in range(int(toSimpleString(non_pledge_basket.unit))):
-                    # BasketOrder.objects.create(basket=basket, order=order,
-                        # price_per_unit=toSimpleString(non_pledge_basket.price_per_unit))
-        # if self.xml.order.pledge_baskets and self.xml.order.pledge_baskets.basket:
-            # for pledge_basket in self.xml.order.pledge_baskets.basket:
-                # basket = Basket.objects.get(id=toSimpleString(pledge_basket.id))
-                # for i in range(int(toSimpleString(pledge_basket.unit))):
-                    # BasketOrder.objects.create(basket=basket, order=order, is_pledge=True,
-                        # price_per_unit=toSimpleString(pledge_basket.price_per_unit))
-        # if self.xml.order.paid:
-            # Payment.objects.create(person=order.person,
-                # amount=toSimpleString(self.xml.order.paid))
-        # doc = model_to_xml(order)
-        # elm = doc.createElement('order_items')
-        # for item in order.order_items.all():
-            # elm.appendChild(model_to_xml(item).documentElement)
-        # doc.documentElement.appendChild(elm)
-        # return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
         
     def do_PUT(self, id):
         order = Order.objects.get(id=id)
@@ -301,10 +279,21 @@ class OrderController(Controller):
 
     def do_DELETE(self, id):
         order = Order.objects.get(id=id)
+        person = order.person
+        amount = order.paid
         order.delete()
+        for o in person.orders.extra(where=['paid <> total']).order_by('created'):
+            if amount <= 0:
+                break
+            amount -= order.total - order.paid
+            o.save()
         return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
         
     def update_order(self, order):
+        is_edit = False
+        if order.id:
+            is_edit = True
+        before_total = order.total
         update_model(order, self.xml.order)
         for item in self.xml.order.order_items.order_item:
             if item.id:
@@ -326,9 +315,34 @@ class OrderController(Controller):
                 for i in range(int(toSimpleString(pledge_basket.unit))):
                     BasketOrder.objects.create(basket=basket, order=order, is_pledge=True,
                         price_per_unit=toSimpleString(pledge_basket.price_per_unit))
+        order.save()
+        after_total = order.total
+        if is_edit:
+            diff_total = before_total - after_total
+            if diff_total < 0:
+                diff_total = abs(diff_total)
+                for o in order.person.orders.filter(paid__gt=0):
+                    if diff_total <= 0:
+                        break
+                    if int(o.id) != int(order.id):
+                        diff_total -= o.paid
+                    o.save()
+            elif diff_total > 0:
+                for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):
+                    if diff_total <= 0:
+                        break
+                    if int(o.id) != int(order.id):
+                        diff_total -= o.total - o.paid
+                    o.save()
         if self.xml.order.paid:
-            Payment.objects.create(person=order.person,
+            payment = Payment.objects.create(person=order.person,
                 amount=toSimpleString(self.xml.order.paid))
+            amount = decimal.Decimal(payment.amount)
+            for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):
+                if amount <= 0:
+                    break
+                amount -= o.total - o.paid
+                o.save()
         doc = model_to_xml(order)
         elm = doc.createElement('order_items')
         for item in order.order_items.all():
@@ -360,6 +374,7 @@ class OrderItemController(Controller):
         order_item = OrderItem.objects.get(id=id)
         order_item.is_deleted = True
         order_item.save()
+        order_item.order.save()
         return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 
@@ -413,6 +428,12 @@ class PaymentController(Controller):
     def do_POST(self):
         payment = Payment()
         update_model(payment, self.xml.payment)
+        amount = decimal.Decimal(payment.amount)
+        for order in payment.person.orders.extra(where=['paid <> total']).order_by('created'):
+            if amount <= 0:
+                break
+            amount -= order.total - order.paid
+            order.save()
         return response_xml(payment)
         
     def do_PUT(self, id):
@@ -422,7 +443,14 @@ class PaymentController(Controller):
 
     def do_DELETE(self, id):
         payment = Payment.objects.get(id=id)
+        person = payment.person
+        amount = payment.amount
         payment.delete()
+        for order in person.orders.filter(paid__gt=0):
+            if amount <= 0:
+                break
+            amount -= order.paid
+            order.save()
         return HttpResponse('<id>%s</id>' % id, mimetype='application/xml')
 
 

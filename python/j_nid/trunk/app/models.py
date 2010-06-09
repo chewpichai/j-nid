@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext as _
+import decimal
 
 
 class Person(models.Model):
@@ -25,13 +26,11 @@ class Person(models.Model):
         return u'%s' % self.name
         
     def get_ordered_total(self):
-        orders = self.orders.all()
-        return reduce(lambda x,y: x+y, [order.total for order in orders]) if orders else 0
+        return self.orders.aggregate(models.Sum('total'))['total__sum'] or 0
     ordered_total = property(get_ordered_total)
     
     def get_paid(self):
-        sum = self.payments.aggregate(models.Sum('amount'))['amount__sum']
-        return sum or 0
+        return self.payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
     paid = property(get_paid)
     
     def get_outstanding_total(self):
@@ -54,7 +53,7 @@ class Person(models.Model):
         payments = self.payments.filter(created__lt=date)
         orders = self.orders.filter(created__lt=date)
         paid = payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
-        outstanding = reduce(lambda x,y: x+y, [order.total for order in orders]) if orders else 0
+        outstanding = orders.aggregate(models.Sum('total'))['total__sum'] or 0
         return paid - outstanding
         
         
@@ -143,6 +142,8 @@ class Product(models.Model):
 
 class Order(models.Model):
     person = models.ForeignKey(Person, related_name='orders')
+    paid = models.DecimalField(max_digits=9, decimal_places=2)
+    total = models.DecimalField(max_digits=9, decimal_places=2)
     notation = models.TextField(blank=True, default='')
     created = models.DateTimeField(auto_now_add=True)
     
@@ -154,26 +155,27 @@ class Order(models.Model):
     def __unicode__(self):
         return u'Order: %s[%s]' % (self.person.name, self.total)
         
+    def save(self, force_insert=False, force_update=False):
+        self.total = self.get_total()
+        self.paid = self.get_paid()
+        super(Order, self).save(force_insert, force_update)
+        
     def get_total(self):
-        order_items = self.order_items.all()
-        sum_items = reduce(lambda x,y: x+y, [i.total for i in order_items]) if order_items else 0
-        pledge_baskets = self.order_baskets.filter(is_pledge=True)
-        sum_pledge_baskets = reduce(lambda x,y: x+y, [b.price_per_unit for b in pledge_baskets]) if pledge_baskets else 0
+        sum_items = self.order_items.filter(is_deleted=False).aggregate(models.Sum('total'))['total__sum'] or 0
+        sum_pledge_baskets = self.order_baskets.filter(is_pledge=True).aggregate(models.Sum('price_per_unit'))['price_per_unit__sum'] or 0
         return sum_items + sum_pledge_baskets
-    total = property(get_total)
     
     def get_person_name(self):
         return u'%s' % self.person
     person_name = property(get_person_name)
     
     def get_paid(self):
-        total = self.total
-        orders = list(self.person.orders.filter(created__lte=self.created))
-        orders.remove(self)
-        sum = reduce(lambda x,y: x+y, [order.total for order in orders]) if orders else 0
-        paid = self.person.paid - sum
-        return max(paid, 0) if paid - total < 0 else total
-    paid = property(get_paid)
+        if not self.created:
+            return 0
+        orders = self.person.orders.filter(created__lt=self.created)
+        sum_ordered = orders.aggregate(models.Sum('total'))['total__sum'] or 0
+        paid = self.person.paid - sum_ordered
+        return min(max(paid, 0), self.total)
     
     def get_is_paid(self):
         return self.paid == self.total
@@ -186,6 +188,7 @@ class OrderItem(models.Model):
     cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     unit = models.PositiveIntegerField()
+    total = models.DecimalField(max_digits=9, decimal_places=2)
     is_deleted = models.BooleanField(default=False)
     
     class Meta:
@@ -195,9 +198,9 @@ class OrderItem(models.Model):
     def __unicode__(self):
         return u'OrderItem %s' % self.product.name
         
-    def get_total(self):
-        return self.unit * self.price_per_unit
-    total = property(get_total)
+    def save(self, force_insert=False, force_update=False):
+        self.total = int(self.unit) * decimal.Decimal(self.price_per_unit)
+        super(OrderItem, self).save(force_insert, force_update)
     
     def get_name(self):
         return u'%s' % self.product.name
