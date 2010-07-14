@@ -24,6 +24,8 @@ def update_model(model, xml):
                 value = value or ''
             elif isinstance(field, models.TextField):
                 value = value or ''
+            elif isinstance(field, models.DateTimeField):
+                value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
             setattr(model, field.attname, value)
         except TypeError:
             continue

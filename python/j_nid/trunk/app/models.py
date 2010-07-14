@@ -145,7 +145,7 @@ class Order(models.Model):
     paid = models.DecimalField(max_digits=9, decimal_places=2)
     total = models.DecimalField(max_digits=9, decimal_places=2)
     notation = models.TextField(blank=True, default='')
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
     
     class Meta:
         db_table = 'orders'
