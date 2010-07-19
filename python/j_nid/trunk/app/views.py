@@ -545,7 +545,33 @@ class BasketOrderController(Controller):
             update_model(basket_order, xml)
         return HttpResponse()
         
-def get_transactions(request, person_id):
+def get_transactions(request):
+    orders = Order.objects.all()
+    payments = Payment.objects.all()
+    transactions = []
+    filters = request.GET.get('filters')
+    if filters:
+        filters = dict([f.split('=') for f in filters.split(',')])
+        date_range = filters.get('date_range')
+        if date_range:
+            date_range = [datetime.datetime.strptime(d, '%Y-%m-%d')
+                          for d in date_range.split(':')]
+            date_range[1] += datetime.timedelta(1)
+            orders = orders.filter(created__range=date_range)
+            payments = payments.filter(created__range=date_range)
+    for order in orders:
+        transactions.append(Transaction(order))
+    for payment in payments:
+        transactions.append(Transaction(payment))
+    transactions.sort()
+    transactions.reverse()
+    impl = getDOMImplementation()
+    doc = impl.createDocument(None, 'transactions', None)
+    for transaction in transactions:
+        doc.documentElement.appendChild(transaction.to_xml().documentElement)
+    return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
+        
+def get_person_transactions(request, person_id):
     person = get_object_or_404(Person, id=person_id)
     orders = person.orders.all()
     payments = person.payments.all()
@@ -580,6 +606,7 @@ def get_transactions(request, person_id):
     for transaction in transactions:
         doc.documentElement.appendChild(transaction.to_xml().documentElement)
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
+
 
 class Transaction(object):
     def __init__(self, obj):
