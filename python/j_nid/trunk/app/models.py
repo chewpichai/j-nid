@@ -99,7 +99,7 @@ class Payment(models.Model):
     person = models.ForeignKey(Person, related_name='payments')
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     notation = models.TextField(blank=True, default='')
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
     
     class Meta:
         db_table = 'payments'
