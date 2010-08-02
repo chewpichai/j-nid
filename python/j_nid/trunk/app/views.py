@@ -337,8 +337,9 @@ class OrderController(Controller):
                         diff_total -= o.total - o.paid
                     o.save()
         if self.xml.order.paid:
+            created = order.created + datetime.timedelta(seconds=30)
             payment = Payment.objects.create(person=order.person,
-                amount=toSimpleString(self.xml.order.paid))
+                amount=toSimpleString(self.xml.order.paid), created=created)
             amount = decimal.Decimal(payment.amount)
             for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):
                 if amount <= 0:
