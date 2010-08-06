@@ -122,7 +122,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     type = models.ForeignKey(ProductType, db_column='type',
                         related_name='products')
-    unit = models.PositiveIntegerField()
+    unit = models.DecimalField(max_digits=9, decimal_places=2)
     cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     is_sale = models.BooleanField()
@@ -187,7 +187,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, related_name='order_items')
     cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    unit = models.PositiveIntegerField()
+    unit = models.DecimalField(max_digits=9, decimal_places=2)
     total = models.DecimalField(max_digits=9, decimal_places=2)
     is_deleted = models.BooleanField(default=False)
     
@@ -199,7 +199,7 @@ class OrderItem(models.Model):
         return u'OrderItem %s' % self.product.name
         
     def save(self, force_insert=False, force_update=False):
-        self.total = int(self.unit) * decimal.Decimal(self.price_per_unit)
+        self.total = decimal.Decimal(self.unit) * decimal.Decimal(self.price_per_unit)
         super(OrderItem, self).save(force_insert, force_update)
     
     def get_name(self):
@@ -231,7 +231,7 @@ class SupplyItem(models.Model):
     supply = models.ForeignKey(Supply, related_name='supply_items')
     product = models.ForeignKey(Product, related_name='supply_items')
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    unit = models.PositiveIntegerField()
+    unit = models.DecimalField(max_digits=9, decimal_places=2)
     is_deleted = models.BooleanField(default=False)
     
     class Meta:
