@@ -303,20 +303,20 @@ class OrderController(Controller):
             else:
                 order_item = OrderItem(order=order)
             update_model(order_item, item)
-        order.order_baskets.filter(is_pledge=False).delete()
-        if self.xml.order.non_pledge_baskets and self.xml.order.non_pledge_baskets.basket:
-            for non_pledge_basket in self.xml.order.non_pledge_baskets.basket:
-                basket = Basket.objects.get(id=toSimpleString(non_pledge_basket.id))
-                for i in range(int(toSimpleString(non_pledge_basket.unit))):
+        order.order_baskets.filter(is_deposit=False).delete()
+        if self.xml.order.non_deposit_baskets and self.xml.order.non_deposit_baskets.basket:
+            for non_deposit_basket in self.xml.order.non_deposit_baskets.basket:
+                basket = Basket.objects.get(id=toSimpleString(non_deposit_basket.id))
+                for i in range(int(toSimpleString(non_deposit_basket.unit))):
                     BasketOrder.objects.create(basket=basket, order=order,
-                        price_per_unit=toSimpleString(non_pledge_basket.price_per_unit))
-        order.order_baskets.filter(is_pledge=True).delete()
-        if self.xml.order.pledge_baskets and self.xml.order.pledge_baskets.basket:
-            for pledge_basket in self.xml.order.pledge_baskets.basket:
-                basket = Basket.objects.get(id=toSimpleString(pledge_basket.id))
-                for i in range(int(toSimpleString(pledge_basket.unit))):
-                    BasketOrder.objects.create(basket=basket, order=order, is_pledge=True,
-                        price_per_unit=toSimpleString(pledge_basket.price_per_unit))
+                        price_per_unit=toSimpleString(non_deposit_basket.price_per_unit))
+        order.order_baskets.filter(is_deposit=True).delete()
+        if self.xml.order.deposited_baskets and self.xml.order.deposited_baskets.basket:
+            for deposited_basket in self.xml.order.deposited_baskets.basket:
+                basket = Basket.objects.get(id=toSimpleString(deposited_basket.id))
+                for i in range(int(toSimpleString(deposited_basket.unit))):
+                    BasketOrder.objects.create(basket=basket, order=order, is_deposit=True,
+                        price_per_unit=toSimpleString(deposited_basket.price_per_unit))
         order.save()
         after_total = order.total
         if is_edit:
@@ -431,6 +431,12 @@ class PaymentController(Controller):
     def do_POST(self):
         payment = Payment()
         update_model(payment, self.xml.payment)
+        if self.xml.payment.basket_orders and self.xml.payment.basket_orders.basket_order:
+            for xml in self.xml.payment.basket_orders.basket_order:
+                basket_order = BasketOrder.objects.get(id=toSimpleString(xml.id))
+                update_model(basket_order, xml)
+                basket_order.payment = payment
+                basket_order.save()
         amount = decimal.Decimal(payment.amount)
         for order in payment.person.orders.extra(where=['paid <> total']).order_by('created'):
             if amount <= 0:

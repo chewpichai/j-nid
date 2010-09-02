@@ -162,8 +162,8 @@ class Order(models.Model):
         
     def get_total(self):
         sum_items = self.order_items.filter(is_deleted=False).aggregate(models.Sum('total'))['total__sum'] or 0
-        sum_pledge_baskets = self.order_baskets.filter(is_pledge=True).aggregate(models.Sum('price_per_unit'))['price_per_unit__sum'] or 0
-        return sum_items + sum_pledge_baskets
+        sum_deposited_baskets = self.order_baskets.filter(is_deposit=True).aggregate(models.Sum('price_per_unit'))['price_per_unit__sum'] or 0
+        return sum_items + sum_deposited_baskets
     
     def get_person_name(self):
         return u'%s' % self.person
@@ -260,8 +260,9 @@ class Basket(models.Model):
 class BasketOrder(models.Model):
     basket = models.ForeignKey(Basket)
     order = models.ForeignKey(Order, related_name='order_baskets')
+    payment = models.ForeignKey(Payment, related_name='return_baskets')
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    is_pledge = models.BooleanField(default=False)
+    is_deposit = models.BooleanField(default=False)
     is_return = models.BooleanField(default=False)
     
     class Meta:
@@ -275,4 +276,3 @@ class BasketOrder(models.Model):
     def get_quantity(self):
         return 0
     quantity = property(get_quantity)
-        
