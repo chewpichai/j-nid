@@ -104,6 +104,10 @@ class Payment(models.Model):
     class Meta:
         db_table = 'payments'
         ordering = ['-created']
+        
+    def get_person_name(self):
+        return u'%s' % self.person
+    person_name = property(get_person_name)
 
 
 class ProductType(models.Model):

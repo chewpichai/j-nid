@@ -424,7 +424,10 @@ class PhoneNumberController(Controller):
 
 
 class PaymentController(Controller):
-    def do_GET(self):
+    def do_GET(self, id=None):
+        if id:
+            payment = Payment.objects.get(id=id)
+            return response_xml(payment, self.attrs)
         payments = Payment.objects.all()
         return response_xml(payments)
         
@@ -535,12 +538,14 @@ class BasketController(Controller):
         return response_xml(basket)
         
 class BasketOrderController(Controller):
-    def do_GET(self, order_id=None, person_id=None):
+    def do_GET(self, order_id=None, person_id=None, payment_id=None):
         baskets_orders = BasketOrder.objects.all()
         if order_id:
             baskets_orders = baskets_orders.filter(order__id=order_id)
         if person_id:
             baskets_orders = baskets_orders.filter(order__person__id=person_id)
+        if payment_id:
+            baskets_orders = baskets_orders.filter(payment__id=payment_id)
         if self.filters:
             is_return = self.filters.get('is_return')
             baskets_orders = baskets_orders.filter(is_return=bool(int(is_return)))
