@@ -564,13 +564,12 @@ def get_transactions(request):
     filters = request.GET.get('filters')
     if filters:
         filters = dict([f.split('=') for f in filters.split(',')])
-        date_range = filters.get('date_range')
-        if date_range:
-            date_range = [datetime.datetime.strptime(d, '%Y-%m-%d')
-                          for d in date_range.split(':')]
-            date_range[1] += datetime.timedelta(1)
-            orders = orders.filter(created__range=date_range)
-            payments = payments.filter(created__range=date_range)
+        datetime_range = filters.get('datetime_range')
+        if datetime_range:
+            datetime_range = [datetime.datetime.strptime(d, '%Y%m%d%H')
+                              for d in datetime_range.split(':')]
+            orders = orders.filter(created__range=datetime_range)
+            payments = payments.filter(created__range=datetime_range)
     for order in orders:
         transactions.append(Transaction(order))
     for payment in payments:
