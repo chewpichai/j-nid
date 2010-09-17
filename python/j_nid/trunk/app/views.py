@@ -265,9 +265,8 @@ class OrderController(Controller):
                 orders = orders.filter(created__gt=today)
             date_range = self.filters.get('date_range')
             if date_range:
-                date_range = [datetime.datetime.strptime(d, '%Y-%m-%d')
+                date_range = [datetime.datetime.strptime(d, '%Y%m%d')
                               for d in date_range.split(':')]
-                date_range[1] += datetime.timedelta(1)
                 orders = orders.filter(created__range=date_range)
         return response_xml(orders, self.attrs)
 
@@ -593,9 +592,8 @@ def get_person_transactions(request, person_id):
         filters = dict([f.split('=') for f in filters.split(',')])
         date_range = filters.get('date_range')
         if date_range:
-            date_range = [datetime.datetime.strptime(d, '%Y-%m-%d')
+            date_range = [datetime.datetime.strptime(d, '%Y%m%d')
                           for d in date_range.split(':')]
-            date_range[1] += datetime.timedelta(1)
             balance = person.get_balance_until(date_range[0])
             if balance:
                 obj = {'created': date_range[0], 'balance': balance}
@@ -623,6 +621,7 @@ class Transaction(object):
     def __init__(self, obj):
         if isinstance(obj, models.Model):
             self.id = obj.id
+            self.person_name = obj.person.name
             self.type = obj._meta.verbose_name
             self.created = obj.created
             self.outstanding = getattr(obj, 'total', 0)
