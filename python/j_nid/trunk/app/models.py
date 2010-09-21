@@ -105,6 +105,13 @@ class Payment(models.Model):
         db_table = 'payments'
         ordering = ['-created']
         
+    def delete(self):
+        for basket in self.return_baskets.all():
+            basket.is_return = False
+            basket.payment = None
+            basket.save()
+        super(Payment, self).delete()
+        
     def get_person_name(self):
         return u'%s' % self.person
     person_name = property(get_person_name)
@@ -125,7 +132,7 @@ class ProductType(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     type = models.ForeignKey(ProductType, db_column='type',
-                        related_name='products')
+                related_name='products')
     unit = models.DecimalField(max_digits=9, decimal_places=2)
     cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
@@ -264,7 +271,7 @@ class Basket(models.Model):
 class BasketOrder(models.Model):
     basket = models.ForeignKey(Basket)
     order = models.ForeignKey(Order, related_name='order_baskets')
-    payment = models.ForeignKey(Payment, related_name='return_baskets')
+    payment = models.ForeignKey(Payment, related_name='return_baskets', null=True)
     price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
     is_deposit = models.BooleanField(default=False)
     is_return = models.BooleanField(default=False)
