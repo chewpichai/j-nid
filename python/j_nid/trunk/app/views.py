@@ -423,11 +423,14 @@ class PhoneNumberController(Controller):
 
 
 class PaymentController(Controller):
-    def do_GET(self, id=None):
+    def do_GET(self, id=None, person_id=None):
         if id:
             payment = Payment.objects.get(id=id)
             return response_xml(payment, self.attrs)
-        payments = Payment.objects.all()
+        if person_id:
+            payments = Payment.objects.filter(person__id=person_id)
+        else:
+            payments = Payment.objects.all()
         return response_xml(payments)
         
     def do_POST(self):
