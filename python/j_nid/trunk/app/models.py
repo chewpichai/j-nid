@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext as _
 import decimal
+import math
 
 
 class Person(models.Model):
@@ -191,6 +192,11 @@ class Order(models.Model):
     def get_is_paid(self):
         return self.paid == self.total
     is_paid = property(get_is_paid)
+    
+    def get_quantity(self):
+        items = self.order_items.filter(is_deleted=False)
+        return int(sum([item.quantity for item in items]))
+    quantity = property(get_quantity)
 
 
 class OrderItem(models.Model):
@@ -224,6 +230,10 @@ class OrderItem(models.Model):
     def get_unit_per_quantity(self):
         return self.product.unit
     unit_per_quantity = property(get_unit_per_quantity)
+    
+    def get_quantity(self):
+        return math.ceil(self.unit / self.product.unit)
+    quantity = property(get_quantity)
 
 
 class Supply(models.Model):

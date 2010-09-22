@@ -627,6 +627,7 @@ class Transaction(object):
             self.person_name = obj.person.name
             self.type = obj._meta.verbose_name
             self.created = obj.created
+            self.quantity = getattr(obj, 'quantity', '')
             self.outstanding = getattr(obj, 'total', 0)
             self.paid = getattr(obj, 'amount', 0)
             self.note = obj.notation
