@@ -560,7 +560,9 @@ class BasketOrderController(Controller):
         return HttpResponse()
         
 def get_transactions(request):
-    orders = Order.objects.all()
+    # orders = Order.objects.all()
+    orders = Order.objects.extra(select={'quantity':'SELECT SUM(CEIL(order_items.unit/products.unit)) FROM order_items, products WHERE order_items.product_id = products.id AND order_items.order_id = orders.id'})
+    print orders[0]
     payments = Payment.objects.all()
     transactions = []
     filters = request.GET.get('filters')
