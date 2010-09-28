@@ -9,7 +9,9 @@ from j_nid.app.models import *
 from j_nid.p4x import P4X, toSimpleString
 from xml.dom.minidom import getDOMImplementation
 from xml.parsers.expat import ExpatError
-import datetime, decimal
+import datetime
+import decimal
+import math
 
 def update_model(model, xml):
     for field in model._meta.fields:
@@ -622,6 +624,38 @@ def get_person_transactions(request, person_id):
     doc = impl.createDocument(None, 'transactions', None)
     for transaction in transactions:
         doc.documentElement.appendChild(transaction.to_xml().documentElement)
+    return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
+    
+def get_product_stats(request):
+    orders = Order.objects.all()
+    filters = request.GET.get('filters')
+    if filters:
+        filters = dict([f.split('=') for f in filters.split(',')])
+        person_id = filters.get('person_id')
+        if person_id:
+            orders = orders.filter(person=person_id)
+        date_range = filters.get('date_range')
+        if date_range:
+            date_range = [datetime.datetime.strptime(d, '%Y%m%d')
+                          for d in date_range.split(':')]
+            orders = orders.filter(created__range=date_range)
+    products = Product.objects.filter(order_items__order__in=orders).distinct()
+    order_items = OrderItem.objects.filter(order__in=orders)
+    impl = getDOMImplementation()
+    doc = impl.createDocument(None, 'product_stats', None)
+    for product in products:
+        product_stat = impl.createDocument(None, 'product_stat', None)
+        units = product_stat.createElement('unit')
+        unit_sum = order_items.filter(product=product).aggregate(models.Sum('unit'))['unit__sum']
+        units.appendChild(product_stat.createTextNode(u'%s' % unit_sum))
+        product_stat.documentElement.appendChild(units)
+        name = product_stat.createElement('name')
+        name.appendChild(product_stat.createTextNode(u'%s' % product.name))
+        product_stat.documentElement.appendChild(name)
+        quantity = product_stat.createElement('quantity')
+        quantity.appendChild(product_stat.createTextNode(u'%s' % math.ceil(unit_sum / product.unit)))
+        product_stat.documentElement.appendChild(quantity)
+        doc.documentElement.appendChild(product_stat.documentElement)
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
 
 
