@@ -572,12 +572,12 @@ def get_transactions(request):
         if person_id:
             orders = orders.filter(person=person_id)
             payments = payments.filter(person=person_id)
-        datetime_range = filters.get('datetime_range')
-        if datetime_range:
-            datetime_range = [datetime.datetime.strptime(d, '%Y%m%d%H')
-                              for d in datetime_range.split(':')]
-            orders = orders.filter(created__range=datetime_range)
-            payments = payments.filter(created__range=datetime_range)
+        date_range = filters.get('date_range')
+        if date_range:
+            date_range = [datetime.datetime.strptime(d, '%Y%m%d')
+                              for d in date_range.split(':')]
+            orders = orders.filter(created__range=date_range)
+            payments = payments.filter(created__range=date_range)
     orders = orders.extra(select={'quantity':'SELECT SUM(CEIL(order_items.unit/products.unit)) FROM order_items, products WHERE order_items.product_id = products.id AND order_items.order_id = orders.id'})
     for order in orders:
         transactions.append(Transaction(order))
