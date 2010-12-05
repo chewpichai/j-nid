@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext as _
+import datetime
 import decimal
 import math
 
@@ -26,11 +27,17 @@ class Person(models.Model):
     def __unicode__(self):
         return u'%s' % self.name
         
-    def get_ordered_total(self):
+    def get_ordered_total(self, start_date=None, end_date=None):
+        if start_date and end_date:
+            end_date += datetime.timedelta(1)
+            return self.orders.filter(created__range=(start_date, end_date)).aggregate(models.Sum('total'))['total__sum'] or 0
         return self.orders.aggregate(models.Sum('total'))['total__sum'] or 0
     ordered_total = property(get_ordered_total)
     
-    def get_paid(self):
+    def get_paid(self, start_date=None, end_date=None):
+        if start_date and end_date:
+            end_date += datetime.timedelta(1)
+            return self.payments.filter(created__range=(start_date, end_date)).aggregate(models.Sum('amount'))['amount__sum'] or 0
         return self.payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
     paid = property(get_paid)
     
@@ -56,6 +63,17 @@ class Person(models.Model):
         paid = payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
         outstanding = orders.aggregate(models.Sum('total'))['total__sum'] or 0
         return paid - outstanding
+        
+    def get_quantity(self, start_date=None, end_date=None):
+        orders = self.orders.extra(select={'quantity':'SELECT SUM(CEIL(order_items.unit/products.unit)) FROM order_items, products WHERE order_items.product_id = products.id AND order_items.order_id = orders.id'})
+        if start_date and end_date:
+            end_date += datetime.timedelta(1)
+            orders = orders.filter(created__range=(start_date, end_date))
+        qty = 0
+        for order in orders:
+            qty += order.quantity
+        return qty
+    quantity = property(get_quantity)
         
         
 class Bank(models.Model):

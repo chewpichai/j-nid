@@ -657,7 +657,39 @@ def get_product_stats(request):
         product_stat.documentElement.appendChild(quantity)
         doc.documentElement.appendChild(product_stat.documentElement)
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
-
+    
+def get_people_summary(request):
+    people = Person.objects.filter(id__gt=24)
+    date_range = request.GET.get('date_range')
+    if date_range:
+        date_range = [datetime.datetime.strptime(d, '%Y%m%d')
+                      for d in date_range.split(':')]
+    impl = getDOMImplementation()
+    doc = impl.createDocument(None, 'people', None)
+    for person in people:
+        ordered_total = person.get_ordered_total(*date_range) if date_range else person.ordered_total
+        paid = person.get_paid(*date_range) if date_range else person.paid
+        if ordered_total and paid:
+            person_doc = impl.createDocument(None, 'person', None)
+            name_elmt = person_doc.createElement('name')
+            name_elmt.appendChild(person_doc.createTextNode(person.name))
+            person_doc.documentElement.appendChild(name_elmt)
+            quantity_elmt = person_doc.createElement('quantity')
+            quantity = person.get_quantity(*date_range) if date_range else person.quantity
+            quantity_elmt.appendChild(person_doc.createTextNode(u'%s' % quantity))
+            person_doc.documentElement.appendChild(quantity_elmt)
+            ordered_total_elmt = person_doc.createElement('ordered_total')
+            ordered_total_elmt.appendChild(person_doc.createTextNode(u'%s' % ordered_total))
+            person_doc.documentElement.appendChild(ordered_total_elmt)
+            paid_elmt = person_doc.createElement('paid')
+            paid_elmt.appendChild(person_doc.createTextNode(u'%s' % paid))
+            person_doc.documentElement.appendChild(paid_elmt)
+            outstanding_total = paid - ordered_total
+            outstanding_total_elmt = person_doc.createElement('outstanding_total')
+            outstanding_total_elmt.appendChild(person_doc.createTextNode(u'%s' % outstanding_total))
+            person_doc.documentElement.appendChild(outstanding_total_elmt)
+            doc.documentElement.appendChild(person_doc.documentElement)
+    return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
 
 class Transaction(object):
     def __init__(self, obj):
