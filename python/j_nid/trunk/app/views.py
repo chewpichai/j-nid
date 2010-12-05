@@ -584,7 +584,7 @@ def get_transactions(request):
     for payment in payments:
         transactions.append(Transaction(payment))
     transactions.sort()
-    # transactions.reverse()
+    transactions.reverse()
     impl = getDOMImplementation()
     doc = impl.createDocument(None, 'transactions', None)
     for transaction in transactions:
