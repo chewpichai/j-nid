@@ -1,8 +1,8 @@
 ﻿from django.contrib.auth import authenticate, login, logout
-from django.db import models, IntegrityError
+from django.db import connection, models, IntegrityError
 from django.db.models.query import QuerySet
 from django.http import *
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 from j_nid.app.models import *
@@ -733,3 +733,48 @@ class Transaction(object):
                 elm.appendChild(doc.createTextNode(u'%s' % value))
                 doc.documentElement.appendChild(elm)
         return doc
+        
+def get_monthly_report(request, year, month):
+    reports = {}
+    cursor = connection.cursor()
+    cursor.execute('SELECT SUM(total), DATE(created) FROM orders WHERE YEAR(created) = %s AND MONTH(created) = %s GROUP BY DATE(created)', [year, month])
+    for (ordered_total, created) in cursor.fetchall():
+        reports.setdefault(created, {})['ordered_total'] = ordered_total
+    cursor.execute('SELECT SUM(amount), DATE(created) FROM payments WHERE YEAR(created) = %s AND MONTH(created) = %s GROUP BY DATE(created)', [year, month])
+    for (paid_total, created) in cursor.fetchall():
+        reports.setdefault(created, {})['paid_total'] = paid_total
+    cursor.execute('SELECT SUM(CEIL(order_items.unit / products.unit)), DATE(created) FROM order_items INNER JOIN orders ON orders.id = order_items.order_id INNER JOIN products ON order_items.product_id = products.id WHERE YEAR(created) = %s AND MONTH(created) = %s GROUP BY DATE(created)', [year, month])
+    for (quantity, created) in cursor.fetchall():
+        reports.setdefault(created, {})['quantity'] = quantity
+    impl = getDOMImplementation()
+    doc = impl.createDocument(None, 'reports', None)
+    keys = reports.keys()
+    keys.sort()
+    for created in keys:
+        report = reports[created]
+        report_doc = impl.createDocument(None, 'report', None)
+        created_elmt = report_doc.createElement('created')
+        created_elmt.appendChild(report_doc.createTextNode(u'%s' % created.strftime('%a %b %d %H:%M:%S %Y')))
+        report_doc.documentElement.appendChild(created_elmt)
+        for attr, val in report.items():
+            elmt = report_doc.createElement(attr)
+            elmt.appendChild(report_doc.createTextNode(u'%s' % val))
+            report_doc.documentElement.appendChild(elmt)
+        doc.documentElement.appendChild(report_doc.documentElement)
+    return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
+
+def get_year_list(request):
+    years = []
+    cursor = connection.cursor()
+    cursor.execute('SELECT DISTINCT(YEAR(created)) FROM orders ORDER BY created DESC')
+    for (year,) in cursor.fetchall():
+        years.append(year)
+    return render_to_response('year_list.xml', {'years': years}, mimetype='application/xml')
+
+def get_month_list(request, year):
+    months = []
+    cursor = connection.cursor()
+    cursor.execute('SELECT DISTINCT(MONTH(created)) FROM orders WHERE YEAR(created) = %s ORDER BY created DESC', [year])
+    for (month,) in cursor.fetchall():
+        months.append(month)
+    return render_to_response('month_list.xml', {'months': months}, mimetype='application/xml')

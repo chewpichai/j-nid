@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<years>
+{% for year in years %}
+    <year data="{{ year }}"/>
+{% endfor %}
+</years>
