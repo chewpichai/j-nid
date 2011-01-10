@@ -626,7 +626,7 @@ def get_person_transactions(request, person_id):
         doc.documentElement.appendChild(transaction.to_xml().documentElement)
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
     
-def get_product_stats(request):
+def get_products_stats(request):
     orders = Order.objects.all()
     filters = request.GET.get('filters')
     if filters:
@@ -645,6 +645,9 @@ def get_product_stats(request):
     doc = impl.createDocument(None, 'product_stats', None)
     for product in products:
         product_stat = impl.createDocument(None, 'product_stat', None)
+        id = product_stat.createElement('id')
+        id.appendChild(product_stat.createTextNode(u'%s' % product.id))
+        product_stat.documentElement.appendChild(id)
         units = product_stat.createElement('unit')
         unit_sum = order_items.filter(product=product).aggregate(models.Sum('unit'))['unit__sum']
         units.appendChild(product_stat.createTextNode(u'%s' % unit_sum))
@@ -752,6 +755,7 @@ def get_monthly_report(request, year, month):
     keys.sort()
     for created in keys:
         report = reports[created]
+        report['outstanding_total'] = report.get('paid_total', 0) - report.get('ordered_total', 0)
         report_doc = impl.createDocument(None, 'report', None)
         created_elmt = report_doc.createElement('created')
         created_elmt.appendChild(report_doc.createTextNode(u'%s' % created.strftime('%a %b %d %H:%M:%S %Y')))
@@ -778,3 +782,18 @@ def get_month_list(request, year):
     for (month,) in cursor.fetchall():
         months.append(month)
     return render_to_response('month_list.xml', {'months': months}, mimetype='application/xml')
+    
+def get_product_stats(request, id):
+    cursor = connection.cursor()
+    date_range = request.GET.get('date_range')
+    if date_range:
+        date_range = [datetime.datetime.strptime(d, '%Y%m%d') for d in date_range.split(':')]
+        cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [id, date_range[0], date_range[1]])
+    else:
+        cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s GROUP BY products.id, order_items.price_per_unit', [id])
+    stats = []
+    for (name, quantity, price_per_unit) in cursor.fetchall():
+        stats.append({'quantity': quantity, 'price_per_unit': price_per_unit})
+    data = {'name': name, 'stats': stats}
+    return render_to_response('product_stats.xml', data, mimetype='application/xml')
+    
