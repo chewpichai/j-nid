@@ -786,11 +786,18 @@ def get_month_list(request, year):
 def get_product_stats(request, id):
     cursor = connection.cursor()
     date_range = request.GET.get('date_range')
+    person_id = request.GET.get('person_id')
     if date_range:
         date_range = [datetime.datetime.strptime(d, '%Y%m%d') for d in date_range.split(':')]
-        cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [id, date_range[0], date_range[1]])
+        if person_id:
+            cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE orders.person_id = %s AND products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [person_id, id, date_range[0], date_range[1]])
+        else:
+            cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [id, date_range[0], date_range[1]])
     else:
-        cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s GROUP BY products.id, order_items.price_per_unit', [id])
+        if person_id:
+            cursor.execute('SELECT products.`name`, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE orders.person_id = %s AND products.id = %s GROUP BY products.id, order_items.price_per_unit', [person_id, id])
+        else:
+            cursor.execute('SELECT products.`name`, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s GROUP BY products.id, order_items.price_per_unit', [id])
     stats = []
     for (name, quantity, price_per_unit) in cursor.fetchall():
         stats.append({'quantity': quantity, 'price_per_unit': price_per_unit})

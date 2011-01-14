@@ -6,10 +6,6 @@ import math
 
 
 class Person(models.Model):
-    GENERAL_TYPE = 0;
-    CUSTOMER_TYPE = 1;
-    SUPPLIER_TYPE = 2;
-    
     name = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255, blank=True, default='')
     last_name = models.CharField(max_length=255, blank=True, default='')
