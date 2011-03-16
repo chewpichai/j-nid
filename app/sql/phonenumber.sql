@@ -1,0 +1,9 @@
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(1, '0814252660', 1);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(1, '074252661', 4);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(1, '074252662', 3);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(2, '074252663', 4);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(2, '0814252664', 1);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(2, '0814252665', 1);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(3, '0814252666', 1);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(3, '074252667', 3);
+INSERT INTO phone_numbers(person_id, number, type_id) VALUES(3, '0814252668', 1);

@@ -1,0 +1,9 @@
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(1, '0123456780', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(1, '0123456781', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(1, '0123456782', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(2, '0123456783', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(2, '0123456784', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(2, '0123456785', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(3, '0123456786', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(3, '0123456787', 1);
+INSERT INTO bank_accounts(person_id, number, bank_id) VALUES(3, '0123456788', 1);
