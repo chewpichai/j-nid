@@ -6,16 +6,16 @@ import math
 
 
 class Person(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=255, blank=True, default='')
-    last_name = models.CharField(max_length=255, blank=True, default='')
-    id_card_number = models.CharField(max_length=13, blank=True, default='')
-    address = models.TextField(blank=True, default='')
-    detail1 = models.TextField(blank=True, default='')
-    detail2 = models.TextField(blank=True, default='')
-    is_customer = models.BooleanField()
-    is_supplier = models.BooleanField()
-    is_general = models.BooleanField()
+    name            = models.CharField(max_length=255, unique=True)
+    first_name      = models.CharField(max_length=255, blank=True, default='')
+    last_name       = models.CharField(max_length=255, blank=True, default='')
+    id_card_number  = models.CharField(max_length=13, blank=True, default='')
+    address         = models.TextField(blank=True, default='')
+    detail1         = models.TextField(blank=True, default='')
+    detail2         = models.TextField(blank=True, default='')
+    is_customer     = models.BooleanField()
+    is_supplier     = models.BooleanField()
+    is_general      = models.BooleanField()
     
     class Meta:
         db_table = 'people'
@@ -81,9 +81,9 @@ class Bank(models.Model):
 
 
 class BankAccount(models.Model):
-    person = models.ForeignKey(Person, related_name='bank_accounts')
-    number = models.CharField(max_length=20)
-    bank = models.ForeignKey(Bank, related_name='bank_accounts')
+    person  = models.ForeignKey(Person, related_name='bank_accounts')
+    number  = models.CharField(max_length=20)
+    bank    = models.ForeignKey(Bank, related_name='bank_accounts')
     
     class Meta:
         db_table = 'bank_accounts'
@@ -100,9 +100,9 @@ class PhoneType(models.Model):
         
 
 class PhoneNumber(models.Model):
-    person = models.ForeignKey(Person, related_name='phone_numbers')
-    number = models.CharField(max_length=20)
-    type = models.ForeignKey(PhoneType, related_name='phone_numbers')
+    person  = models.ForeignKey(Person, related_name='phone_numbers')
+    number  = models.CharField(max_length=20)
+    type    = models.ForeignKey(PhoneType, related_name='phone_numbers')
     
     class Meta:
         db_table = 'phone_numbers'
@@ -111,10 +111,10 @@ class PhoneNumber(models.Model):
 
 
 class Payment(models.Model):
-    person = models.ForeignKey(Person, related_name='payments')
-    amount = models.DecimalField(max_digits=9, decimal_places=2)
-    notation = models.TextField(blank=True, default='')
-    created = models.DateTimeField()
+    person      = models.ForeignKey(Person, related_name='payments')
+    amount      = models.DecimalField(max_digits=9, decimal_places=2)
+    notation    = models.TextField(blank=True, default='')
+    created     = models.DateTimeField()
     
     class Meta:
         db_table = 'payments'
@@ -133,8 +133,8 @@ class Payment(models.Model):
 
 
 class ProductType(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    color = models.PositiveIntegerField()
+    name    = models.CharField(max_length=255, unique=True)
+    color   = models.PositiveIntegerField()
     
     class Meta:
         db_table = 'product_types'
@@ -145,13 +145,12 @@ class ProductType(models.Model):
 
     
 class Product(models.Model):
-    name = models.CharField(max_length=255)
-    type = models.ForeignKey(ProductType, db_column='type',
-                related_name='products')
-    unit = models.DecimalField(max_digits=9, decimal_places=2)
-    cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    is_sale = models.BooleanField()
+    name            = models.CharField(max_length=255)
+    type            = models.ForeignKey(ProductType, db_column='type', related_name='products')
+    unit            = models.DecimalField(max_digits=9, decimal_places=2)
+    cost_per_unit   = models.DecimalField(max_digits=9, decimal_places=2)
+    price_per_unit  = models.DecimalField(max_digits=9, decimal_places=2)
+    is_sale         = models.BooleanField()
     
     class Meta:
         db_table = 'products'
@@ -167,11 +166,11 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    person = models.ForeignKey(Person, related_name='orders')
-    paid = models.DecimalField(max_digits=9, decimal_places=2)
-    total = models.DecimalField(max_digits=9, decimal_places=2)
-    notation = models.TextField(blank=True, default='')
-    created = models.DateTimeField()
+    person      = models.ForeignKey(Person, related_name='orders')
+    paid        = models.DecimalField(max_digits=9, decimal_places=2)
+    total       = models.DecimalField(max_digits=9, decimal_places=2)
+    notation    = models.TextField(blank=True, default='')
+    created     = models.DateTimeField()
     
     class Meta:
         db_table = 'orders'
@@ -209,13 +208,13 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='order_items')
-    product = models.ForeignKey(Product, related_name='order_items')
-    cost_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    unit = models.DecimalField(max_digits=9, decimal_places=2)
-    total = models.DecimalField(max_digits=9, decimal_places=2)
-    is_deleted = models.BooleanField(default=False)
+    order           = models.ForeignKey(Order, related_name='order_items')
+    product         = models.ForeignKey(Product, related_name='order_items')
+    cost_per_unit   = models.DecimalField(max_digits=9, decimal_places=2)
+    price_per_unit  = models.DecimalField(max_digits=9, decimal_places=2)
+    unit            = models.DecimalField(max_digits=9, decimal_places=2)
+    total           = models.DecimalField(max_digits=9, decimal_places=2)
+    is_deleted      = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'order_items'
@@ -242,9 +241,9 @@ class OrderItem(models.Model):
 
 
 class Supply(models.Model):
-    person = models.ForeignKey(Person, related_name='supplies')
-    notation = models.TextField(blank=True, default='')
-    created = models.DateTimeField(auto_now_add=True)
+    person      = models.ForeignKey(Person, related_name='supplies')
+    notation    = models.TextField(blank=True, default='')
+    created     = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         db_table = 'supplies'
@@ -254,11 +253,11 @@ class Supply(models.Model):
 
 
 class SupplyItem(models.Model):
-    supply = models.ForeignKey(Supply, related_name='supply_items')
-    product = models.ForeignKey(Product, related_name='supply_items')
-    price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    unit = models.DecimalField(max_digits=9, decimal_places=2)
-    is_deleted = models.BooleanField(default=False)
+    supply          = models.ForeignKey(Supply, related_name='supply_items')
+    product         = models.ForeignKey(Product, related_name='supply_items')
+    price_per_unit  = models.DecimalField(max_digits=9, decimal_places=2)
+    unit            = models.DecimalField(max_digits=9, decimal_places=2)
+    is_deleted      = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'supply_items'
@@ -268,12 +267,11 @@ class SupplyItem(models.Model):
         return u'SupplyItem %s' % self.product.name
         
 class Basket(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    unit = models.PositiveIntegerField()
-    orders = models.ManyToManyField(Order, through='BasketOrder',
-                related_name='baskets')
-    is_sale = models.BooleanField()
+    name            = models.CharField(max_length=255, unique=True)
+    price_per_unit  = models.DecimalField(max_digits=9, decimal_places=2)
+    unit            = models.PositiveIntegerField()
+    orders          = models.ManyToManyField(Order, through='BasketOrder', related_name='baskets')
+    is_sale         = models.BooleanField()
 
     class Meta:
         db_table = 'baskets'
@@ -284,12 +282,12 @@ class Basket(models.Model):
         
         
 class BasketOrder(models.Model):
-    basket = models.ForeignKey(Basket)
-    order = models.ForeignKey(Order, related_name='order_baskets')
-    payment = models.ForeignKey(Payment, related_name='return_baskets', null=True)
-    price_per_unit = models.DecimalField(max_digits=9, decimal_places=2)
-    is_deposit = models.BooleanField(default=False)
-    is_return = models.BooleanField(default=False)
+    basket          = models.ForeignKey(Basket)
+    order           = models.ForeignKey(Order, related_name='order_baskets')
+    payment         = models.ForeignKey(Payment, related_name='return_baskets', null=True)
+    price_per_unit  = models.DecimalField(max_digits=9, decimal_places=2)
+    is_deposit      = models.BooleanField(default=False)
+    is_return       = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'baskets_orders'

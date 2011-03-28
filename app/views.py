@@ -433,6 +433,12 @@ class PaymentController(Controller):
             payments = Payment.objects.filter(person__id=person_id)
         else:
             payments = Payment.objects.all()
+        if self.filters:
+            date_range = self.filters.get('date_range')
+            if date_range:
+                date_range = [datetime.datetime.strptime(d, '%Y%m%d')
+                              for d in date_range.split(':')]
+                payments = payments.filter(created__range=date_range)
         return response_xml(payments)
         
     def do_POST(self):
