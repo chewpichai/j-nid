@@ -667,6 +667,13 @@ def get_products_stats(request):
         doc.documentElement.appendChild(product_stat.documentElement)
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
     
+def get_products_stats_detail(request):
+    product_ids = request.GET.get('product_ids').split(',')
+    date_range = request.GET.get('date_range')
+    person_id = int(request.GET.get('person_id', 0))
+    products_stats = [get_product_stats_data(id, person_id, date_range) for id in product_ids]
+    return render_to_response('products_stats.xml', {'products_stats': products_stats}, mimetype='application/xml')
+    
 def get_people_summary(request):
     people = Person.objects.filter(id__gt=24)
     date_range = request.GET.get('date_range')
@@ -790,23 +797,26 @@ def get_month_list(request, year):
     return render_to_response('month_list.xml', {'months': months}, mimetype='application/xml')
     
 def get_product_stats(request, id):
-    cursor = connection.cursor()
     date_range = request.GET.get('date_range')
-    person_id = request.GET.get('person_id')
+    person_id = int(request.GET.get('person_id', 0))
+    data = get_product_stats_data(id, person_id, date_range)
+    return render_to_response('product_stats.xml', data, mimetype='application/xml')
+    
+def get_product_stats_data(product_id, person_id, date_range):
+    cursor = connection.cursor()
     if date_range:
         date_range = [datetime.datetime.strptime(d, '%Y%m%d') for d in date_range.split(':')]
         if person_id:
-            cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE orders.person_id = %s AND products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [person_id, id, date_range[0], date_range[1]])
+            cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE orders.person_id = %s AND products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [person_id, product_id, date_range[0], date_range[1]])
         else:
-            cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [id, date_range[0], date_range[1]])
+            cursor.execute('SELECT products.name, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s AND created BETWEEN %s AND %s GROUP BY products.id, order_items.price_per_unit', [product_id, date_range[0], date_range[1]])
     else:
         if person_id:
-            cursor.execute('SELECT products.`name`, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE orders.person_id = %s AND products.id = %s GROUP BY products.id, order_items.price_per_unit', [person_id, id])
+            cursor.execute('SELECT products.`name`, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE orders.person_id = %s AND products.id = %s GROUP BY products.id, order_items.price_per_unit', [person_id, product_id])
         else:
-            cursor.execute('SELECT products.`name`, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s GROUP BY products.id, order_items.price_per_unit', [id])
+            cursor.execute('SELECT products.`name`, CEIL(SUM(order_items.unit)/products.unit), order_items.price_per_unit FROM order_items INNER JOIN products ON order_items.product_id = products.id INNER JOIN orders ON order_items.order_id = orders.id WHERE products.id = %s GROUP BY products.id, order_items.price_per_unit', [product_id])
     stats = []
     for (name, quantity, price_per_unit) in cursor.fetchall():
         stats.append({'quantity': quantity, 'price_per_unit': price_per_unit})
-    data = {'name': name, 'stats': stats}
-    return render_to_response('product_stats.xml', data, mimetype='application/xml')
+    return {'name': name, 'stats': stats}
     
