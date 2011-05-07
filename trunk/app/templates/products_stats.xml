@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<products_stats>
+{% for product_stats in products_stats %}
+    <product_stats name="{{ product_stats.name }}">
+    {% for stat in product_stats.stats %}
+        <stat quantity="{{ stat.quantity }}" price_per_unit="{{ stat.price_per_unit }}" />
+    {% endfor %}
+    </product_stats>
+{% endfor %}
+</products_stats>
