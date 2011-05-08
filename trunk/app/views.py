@@ -429,7 +429,7 @@ class PaymentController(Controller):
         if id:
             payment = Payment.objects.get(id=id)
             return response_xml(payment, self.attrs)
-        if person_id:
+        if int(person_id):
             payments = Payment.objects.filter(person__id=person_id)
         else:
             payments = Payment.objects.all()
