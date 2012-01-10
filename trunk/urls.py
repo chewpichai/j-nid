@@ -5,6 +5,7 @@ from django.conf.urls.defaults import *
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+	(r'^api/', include('j_nid.api.urls')),
     (r'^j-nid/', include('j_nid.app.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
