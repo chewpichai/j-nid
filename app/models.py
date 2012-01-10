@@ -71,7 +71,7 @@ class Person(models.Model):
         return qty
     quantity = property(get_quantity)
         
-        
+
 class Bank(models.Model):
     name = models.CharField(max_length=255, unique=True)
     
@@ -170,7 +170,7 @@ class Order(models.Model):
     paid        = models.DecimalField(max_digits=9, decimal_places=2)
     total       = models.DecimalField(max_digits=9, decimal_places=2)
     notation    = models.TextField(blank=True, default='')
-    created     = models.DateTimeField()
+    created     = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         db_table = 'orders'
@@ -180,7 +180,7 @@ class Order(models.Model):
     def __unicode__(self):
         return u'Order: %s[%s]' % (self.person.name, self.total)
         
-    def save(self, force_insert=False, force_update=False):
+    def save(self, force_insert=False, force_update=False, using=None):
         self.total = self.get_total()
         self.paid = self.get_paid()
         super(Order, self).save(force_insert, force_update)
@@ -223,7 +223,7 @@ class OrderItem(models.Model):
     def __unicode__(self):
         return u'OrderItem %s' % self.product.name
         
-    def save(self, force_insert=False, force_update=False):
+    def save(self, force_insert=False, force_update=False, using=None):
         self.total = decimal.Decimal(self.unit) * decimal.Decimal(self.price_per_unit)
         super(OrderItem, self).save(force_insert, force_update)
     
