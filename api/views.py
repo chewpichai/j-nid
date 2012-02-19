@@ -12,6 +12,7 @@ def response_json(data):
     serializers.serialize('json', data, ensure_ascii=False, stream=response)
     return response
 
+# =============================================================================
 
 def login(request):
     if request.method == 'POST':
@@ -41,7 +42,8 @@ def get_baskets(request):
 
 def create_order(request):
     obj =  simplejson.loads(request.raw_post_data)
-    order = Order.objects.create(notation=obj['notation'], person_id=obj['person'])
+    order = Order.objects.create(notation=obj['notation'],
+                person_id=obj['person'], created=datetime.datetime.now())
     for item in obj['order_items']:
         if item['is_basket']:
             order.order_baskets.create(
