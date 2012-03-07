@@ -33,7 +33,7 @@ def get_products(request):
     return response_json(products)
 
 def get_customers(requset):
-    customers = Person.objects.filter(is_customer=True)
+    customers = Person.objects.filter(is_customer=True).order_by('name')
     return response_json(customers)
 
 def get_baskets(request):
