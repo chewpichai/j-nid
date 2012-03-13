@@ -46,16 +46,15 @@ def create_order(request):
                 person_id=obj['person'], created=datetime.datetime.now())
     for item in obj['order_items']:
         if item['is_basket']:
-            order.order_baskets.create(
-                basket_id=item['product'],
-                price_per_unit=item['price_per_unit'],
-                is_deposit=item['is_deposit'])
+            for i in xrange(int(item['unit'])):
+                order.order_baskets.create(basket_id=item['product'],
+                                           price_per_unit=item['price_per_unit'],
+                                           is_deposit=item['is_deposit'])
         else:
-            order.order_items.create(
-                product_id=item['product'],
-                price_per_unit=item['price_per_unit'],
-                unit=item['unit'],
-                cost_per_unit=item['cost_per_unit'])
+            order.order_items.create(product_id=item['product'],
+                                     price_per_unit=item['price_per_unit'],
+                                     unit=item['unit'],
+                                     cost_per_unit=item['cost_per_unit'])
     order.save()
     paid = decimal.Decimal(obj['paid'])
     if paid:
