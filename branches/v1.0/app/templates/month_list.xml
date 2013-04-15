@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<months>
+{% for month in months %}
+    <month data="{{ month }}"/>
+{% endfor %}
+</months>
