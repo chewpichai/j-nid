@@ -1,0 +1,44 @@
+{% extends 'web/base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="day-form">
+      <div class="field">
+        <label for="">วันที่:</label>
+        {{ form.date }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="รายงาน">
+      </div>
+    </form>
+  </div>
+
+  <div class="content">
+    <table class="order-list payment-list">
+      <thead>
+        <tr>
+          <th class="no">ลำดับ</th>
+          <th class="time">เวลา</th>
+          <th class="name">รายชื่อลูกค้า</th>
+          <th class="total">ยอดซื้อ</th>
+          <th class="amount">ยอดจ่าย</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for transaction in transactions %}
+          <tr {% if transaction.total %}order-id{% else %}payment-id{% endif %}={{ transaction.pk }}>
+            <td class="no">{{ forloop.counter }}</td>
+            <td class="time">{{ transaction.created|time:'H:i' }}</td>
+            <td class="name">{{ transaction.person_name }}</td>
+            <td class="total red">{{ transaction.total|floatformat|intcomma }}</td>
+            <td class="amount blue">{{ transaction.amount|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

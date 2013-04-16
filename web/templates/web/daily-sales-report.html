@@ -1,0 +1,46 @@
+{% extends 'web/base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="day-form">
+      <div class="field">
+        <label for="">วันที่:</label>
+        {{ form.date }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="รายงาน">
+      </div>
+    </form>
+  </div>
+
+  <div class="content">
+    <table class="order-list">
+      <thead>
+        <tr>
+          <th class="no">ลำดับ</th>
+          <th class="time">เวลา</th>
+          <th class="name">รายชื่อลูกค้า</th>
+          <th class="total">ยอดซื้อ</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for order in orders %}
+          <tr order-id={{ order.pk }}>
+            <td class="no">{{ forloop.counter }}</td>
+            <td class="time">{{ order.created|time:'H:i' }}</td>
+            <td class="name">{{ order.person_name }}</td>
+            <td class="total">{{ order.total|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+        <tr class="sum">
+          <th>รวม</th>
+          <td class="total" colspan="3">{{ sums|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

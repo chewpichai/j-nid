@@ -1,4 +1,5 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
+
 
 urlpatterns = patterns('j_nid.api.views',
     url(r'^login/$', 'login', name='api-login'),

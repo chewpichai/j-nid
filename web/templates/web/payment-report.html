@@ -1,0 +1,51 @@
+{% extends 'web/base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="day-form">
+      <div class="field">
+        <label for="">เริ่มจาก:</label>
+        {{ form.start_date }}
+      </div>
+
+      <div class="field">
+        <label for="">ถึง:</label>
+        {{ form.end_date }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="รายงาน">
+      </div>
+    </form>
+  </div>
+
+  <div class="content">
+    <table class="payment-list order-list">
+      <thead>
+        <tr>
+          <th class="no">ลำดับ</th>
+          <th class="time">เวลา</th>
+          <th class="name">รายชื่อลูกค้า</th>
+          <th class="total">ยอดจ่าย</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for payment in payments %}
+          <tr payment-id={{ payment.pk }}>
+            <td class="no">{{ forloop.counter }}</td>
+            <td class="time">{{ payment.created|date:'d/m H:i' }}</td>
+            <td class="name">{{ payment.person_name }}</td>
+            <td class="total">{{ payment.amount|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+        <tr class="sum">
+          <th>รวม</th>
+          <td class="total" colspan="3">{{ sums|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

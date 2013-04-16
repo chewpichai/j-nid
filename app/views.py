@@ -4,7 +4,6 @@ from django.db.models.query import QuerySet
 from django.http import *
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.translation import ugettext as _
-from django.views.generic.list_detail import object_list
 from j_nid.app.models import *
 from j_nid.p4x import P4X, toSimpleString
 from xml.dom.minidom import getDOMImplementation
@@ -26,11 +25,14 @@ def update_model(model, xml):
                 value = value or ''
             elif isinstance(field, models.TextField):
                 value = value or ''
+            elif isinstance(field, models.DecimalField):
+                value = decimal.Decimal(value)
             elif isinstance(field, models.DateTimeField):
                 value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
             setattr(model, field.attname, value)
         except TypeError:
             continue
+    
     model.save()
     
 def model_to_xml(model, attrs=None):
@@ -76,28 +78,34 @@ class Controller(object):
         self.request = request
         method = self.request.method
         self.filters = self.request.GET.get('filters')
+
         if self.filters:
             try:
                 self.filters = dict([f.split('=') for f in self.filters.split(',')])
             except ValueError:
                 self.filters = None
+        
         self.attrs = self.request.GET.get('attrs')
+        
         if self.attrs:
             try:
                 self.attrs = self.attrs.split(',')
             except ValueError:
                 self.attrs = None
-        if self.request.raw_post_data:
+        
+        if self.request.body:
             try:
-                self.xml = P4X(self.request.raw_post_data)
+                self.xml = P4X(self.request.body)
                 if self.xml.method:
                     method = toSimpleString(self.xml.method)
             except ExpatError:
                 pass
+        
         try:
             callback = getattr(self, 'do_%s' % method)
         except AttributeError:
             return HttpResponseNotFound()
+        
         response = callback(**kwargs)
         response.content_type = 'application/xml'
         return response
@@ -256,20 +264,28 @@ class OrderController(Controller):
         if id:
             order = Order.objects.get(id=id)
             return response_xml(order, self.attrs)
+        
         orders = Order.objects.all()
+        
         if self.filters:
             person_id = self.filters.get('person_id')
+            
             if person_id:
                 orders = orders.filter(person__id=person_id)
+            
             is_today = self.filters.get('is_today')
+            
             if int(is_today):
                 today = datetime.date.today()
                 orders = orders.filter(created__gt=today)
+            
             date_range = self.filters.get('date_range')
+            
             if date_range:
                 date_range = [datetime.datetime.strptime(d, '%Y%m%d')
                               for d in date_range.split(':')]
                 orders = orders.filter(created__range=date_range)
+        
         return response_xml(orders, self.attrs)
 
     def do_POST(self):
@@ -294,63 +310,87 @@ class OrderController(Controller):
         
     def update_order(self, order):
         is_edit = False
+        
         if order.id:
             is_edit = True
+        
         before_total = order.total
         update_model(order, self.xml.order)
+        
         for item in self.xml.order.order_items.order_item:
             if item.id:
                 order_item = order.order_items.get(id=toSimpleString(item.id))
             else:
                 order_item = OrderItem(order=order)
+            
             update_model(order_item, item)
+            print 'order_item = %s' % order_item
+        
         order.order_baskets.filter(is_deposit=False).delete()
+        
         if self.xml.order.non_deposit_baskets and self.xml.order.non_deposit_baskets.basket:
             for non_deposit_basket in self.xml.order.non_deposit_baskets.basket:
                 basket = Basket.objects.get(id=toSimpleString(non_deposit_basket.id))
+                
                 for i in range(int(toSimpleString(non_deposit_basket.unit))):
                     BasketOrder.objects.create(basket=basket, order=order,
                         price_per_unit=toSimpleString(non_deposit_basket.price_per_unit))
+        
         order.order_baskets.filter(is_deposit=True).delete()
+        
         if self.xml.order.deposited_baskets and self.xml.order.deposited_baskets.basket:
             for deposited_basket in self.xml.order.deposited_baskets.basket:
                 basket = Basket.objects.get(id=toSimpleString(deposited_basket.id))
+                
                 for i in range(int(toSimpleString(deposited_basket.unit))):
                     BasketOrder.objects.create(basket=basket, order=order, is_deposit=True,
                         price_per_unit=toSimpleString(deposited_basket.price_per_unit))
+        
         order.save()
         after_total = order.total
+        
         if is_edit:
             diff_total = before_total - after_total
+            
             if diff_total < 0:
                 diff_total = abs(diff_total)
+                
                 for o in order.person.orders.filter(paid__gt=0):
                     if diff_total <= 0:
                         break
+                    
                     if int(o.id) != int(order.id):
                         diff_total -= o.paid
+                    
                     o.save()
             elif diff_total > 0:
                 for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):
                     if diff_total <= 0:
                         break
+                    
                     if int(o.id) != int(order.id):
                         diff_total -= o.total - o.paid
+                    
                     o.save()
+        
         if self.xml.order.paid:
             created = order.created + datetime.timedelta(seconds=30)
             payment = Payment.objects.create(person=order.person,
                 amount=toSimpleString(self.xml.order.paid), created=created)
             amount = decimal.Decimal(payment.amount)
+            
             for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):
                 if amount <= 0:
                     break
+                
                 amount -= o.total - o.paid
                 o.save()
         doc = model_to_xml(order)
         elm = doc.createElement('order_items')
+        
         for item in order.order_items.all():
             elm.appendChild(model_to_xml(item).documentElement)
+        
         doc.documentElement.appendChild(elm)
         return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
 
@@ -546,55 +586,71 @@ class BasketController(Controller):
         basket = Basket.objects.get(id=id)
         update_model(basket, self.xml.basket)
         return response_xml(basket)
+
         
 class BasketOrderController(Controller):
     def do_GET(self, order_id=None, person_id=None, payment_id=None):
         baskets_orders = BasketOrder.objects.all()
+        
         if order_id:
             baskets_orders = baskets_orders.filter(order__id=order_id)
+        
         if person_id:
             baskets_orders = baskets_orders.filter(order__person__id=person_id)
+        
         if payment_id:
             baskets_orders = baskets_orders.filter(payment__id=payment_id)
+        
         if self.filters:
             is_return = self.filters.get('is_return')
             baskets_orders = baskets_orders.filter(is_return=bool(int(is_return)))
+        
         return response_xml(baskets_orders, self.attrs)
         
     def do_PUT(self):
         for xml in self.xml.basket_orders.basket_order:
             basket_order = BasketOrder.objects.get(id=toSimpleString(xml.id))
             update_model(basket_order, xml)
+            
         return HttpResponse()
+
         
 def get_transactions(request):
     orders = Order.objects.all()
     payments = Payment.objects.all()
     transactions = []
     filters = request.GET.get('filters')
+    
     if filters:
         filters = dict([f.split('=') for f in filters.split(',')])
         person_id = filters.get('person_id')
+        
         if person_id:
             orders = orders.filter(person=person_id)
             payments = payments.filter(person=person_id)
+        
         date_range = filters.get('date_range')
+        
         if date_range:
             date_range = [datetime.datetime.strptime(d, '%Y%m%d')
-                              for d in date_range.split(':')]
+                          for d in date_range.split(':')]
             orders = orders.filter(created__range=date_range)
             payments = payments.filter(created__range=date_range)
-    orders = orders.extra(select={'quantity':'SELECT SUM(CEIL(order_items.unit/products.unit)) FROM order_items, products WHERE order_items.product_id = products.id AND order_items.order_id = orders.id'})
+    
     for order in orders:
         transactions.append(Transaction(order))
+    
     for payment in payments:
         transactions.append(Transaction(payment))
+    
     transactions.sort()
     transactions.reverse()
     impl = getDOMImplementation()
     doc = impl.createDocument(None, 'transactions', None)
+    
     for transaction in transactions:
         doc.documentElement.appendChild(transaction.to_xml().documentElement)
+    
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
         
 def get_person_transactions(request, person_id):
@@ -604,34 +660,46 @@ def get_person_transactions(request, person_id):
     transactions = []
     balance = 0
     filters = request.GET.get('filters')
+    
     if filters:
         filters = dict([f.split('=') for f in filters.split(',')])
         date_range = filters.get('date_range')
+        
         if date_range:
             date_range = [datetime.datetime.strptime(d, '%Y%m%d')
                           for d in date_range.split(':')]
             balance = person.get_balance_until(date_range[0])
+            
             if balance:
                 obj = {'created': date_range[0], 'balance': balance}
                 transactions.append(Transaction(obj))
+            
             orders = orders.filter(created__range=date_range)
             payments = payments.filter(created__range=date_range)
+    
     for order in orders:
         transactions.append(Transaction(order))
+    
     for payment in payments:
         transactions.append(Transaction(payment))
+    
     transactions.sort()
+    
     for transaction in transactions:
         if transaction.type != 'balance':
             transaction.balance += balance
             balance = transaction.balance
+    
     transactions.reverse()
     impl = getDOMImplementation()
     doc = impl.createDocument(None, 'transactions', None)
+    
     for transaction in transactions:
         doc.documentElement.appendChild(transaction.to_xml().documentElement)
+    
     return HttpResponse(doc.toxml('utf-8'), mimetype='application/xml')
     
+
 def get_products_stats(request):
     orders = Order.objects.all()
     filters = request.GET.get('filters')

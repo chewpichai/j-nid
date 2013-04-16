@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_delete, pre_save, post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 import datetime
 import decimal
@@ -6,52 +8,53 @@ import math
 
 
 class Person(models.Model):
-    name            = models.CharField(max_length=255, unique=True)
-    first_name      = models.CharField(max_length=255, blank=True, default='')
-    last_name       = models.CharField(max_length=255, blank=True, default='')
-    id_card_number  = models.CharField(max_length=13, blank=True, default='')
-    address         = models.TextField(blank=True, default='')
-    detail1         = models.TextField(blank=True, default='')
-    detail2         = models.TextField(blank=True, default='')
-    is_customer     = models.BooleanField()
-    is_supplier     = models.BooleanField()
-    is_general      = models.BooleanField()
+    name                    = models.CharField(max_length=255, unique=True)
+    first_name              = models.CharField(max_length=255, blank=True, default='')
+    last_name               = models.CharField(max_length=255, blank=True, default='')
+    id_card_number          = models.CharField(max_length=13, blank=True, default='')
+    address                 = models.TextField(blank=True, default='')
+    detail1                 = models.TextField(blank=True, default='')
+    detail2                 = models.TextField(blank=True, default='')
+    is_customer             = models.BooleanField()
+    is_supplier             = models.BooleanField()
+    is_general              = models.BooleanField()
+    ordered_total           = models.DecimalField(max_digits=11, decimal_places=2, default=0)
+    paid                    = models.DecimalField(max_digits=11, decimal_places=2, default=0)
+    outstanding_total       = models.DecimalField(max_digits=11, decimal_places=2, default=0)
+    num_outstanding_orders  = models.PositiveIntegerField(default=0)
+    quantity                = models.PositiveIntegerField(default=0)
+    latest_order_date       = models.DateTimeField(null=True, blank=True)
     
     class Meta:
         db_table = 'people'
 
     def __unicode__(self):
         return u'%s' % self.name
+    
+    @property
+    def phone_number(self):
+        return self.phone_numbers.all()[0].number if self.phone_numbers.count() else ''
+
+    def get_outstanding_total(self):
+        return self.paid - self.ordered_total
+    
+    def get_latest_order_date(self):
+        return self.orders.latest().created if self.orders.count() else None
         
     def get_ordered_total(self, start_date=None, end_date=None):
         if start_date and end_date:
             end_date += datetime.timedelta(1)
             return self.orders.filter(created__range=(start_date, end_date)).aggregate(models.Sum('total'))['total__sum'] or 0
         return self.orders.aggregate(models.Sum('total'))['total__sum'] or 0
-    ordered_total = property(get_ordered_total)
     
     def get_paid(self, start_date=None, end_date=None):
         if start_date and end_date:
             end_date += datetime.timedelta(1)
             return self.payments.filter(created__range=(start_date, end_date)).aggregate(models.Sum('amount'))['amount__sum'] or 0
         return self.payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
-    paid = property(get_paid)
-    
-    def get_outstanding_total(self):
-        return self.paid - self.ordered_total
-    outstanding_total = property(get_outstanding_total)
-    
-    def get_latest_order_date(self):
-        return self.orders.latest().created if self.orders.count() else ''
-    latest_order_date = property(get_latest_order_date)
-    
+
     def get_num_outstanding_orders(self):
         return len([order for order in self.orders.all() if not order.is_paid])
-    num_outstanding_orders = property(get_num_outstanding_orders)
-    
-    def get_phone_number(self):
-        return self.phone_numbers.all()[0].number if self.phone_numbers.count() else ''
-    phone_number = property(get_phone_number)
     
     def get_balance_until(self, date):
         payments = self.payments.filter(created__lt=date)
@@ -61,15 +64,11 @@ class Person(models.Model):
         return paid - outstanding
         
     def get_quantity(self, start_date=None, end_date=None):
-        orders = self.orders.extra(select={'quantity':'SELECT SUM(CEIL(order_items.unit/products.unit)) FROM order_items, products WHERE order_items.product_id = products.id AND order_items.order_id = orders.id'})
+        orders = self.orders.all()
         if start_date and end_date:
             end_date += datetime.timedelta(1)
             orders = orders.filter(created__range=(start_date, end_date))
-        qty = 0
-        for order in orders:
-            qty += order.quantity
-        return qty
-    quantity = property(get_quantity)
+        return orders.aggregate(models.Sum('quantity'))['quantity__sum'] or 0
         
 
 class Bank(models.Model):
@@ -120,16 +119,9 @@ class Payment(models.Model):
         db_table = 'payments'
         ordering = ['-created']
         
-    def delete(self):
-        for basket in self.return_baskets.all():
-            basket.is_return = False
-            basket.payment = None
-            basket.save()
-        super(Payment, self).delete()
-        
-    def get_person_name(self):
+    @property
+    def person_name(self):
         return u'%s' % self.person
-    person_name = property(get_person_name)
 
 
 class ProductType(models.Model):
@@ -160,9 +152,9 @@ class Product(models.Model):
     def __unicode__(self):
         return u'%s: %s' % (self.type, self.name)
         
-    def get_color(self):
+    @property
+    def color(self):
         return self.type.color
-    color = property(get_color)
 
 
 class Order(models.Model):
@@ -171,6 +163,7 @@ class Order(models.Model):
     total       = models.DecimalField(max_digits=9, decimal_places=2)
     notation    = models.TextField(blank=True, default='')
     created     = models.DateTimeField()
+    quantity    = models.PositiveIntegerField(default=0)
     
     class Meta:
         db_table = 'orders'
@@ -179,32 +172,31 @@ class Order(models.Model):
 
     def __unicode__(self):
         return u'Order: %s[%s]' % (self.person.name, self.total)
-        
-    def save(self, force_insert=False, force_update=False, using=None):
-        self.total = self.get_total()
-        self.paid = self.get_paid()
-        super(Order, self).save(force_insert, force_update)
-        
+    
+    @property
+    def person_name(self):
+        return u'%s' % self.person
+    
+    @property
+    def is_paid(self):
+        return self.paid >= self.total
+
     def get_total(self):
         sum_items = self.order_items.filter(is_deleted=False).aggregate(models.Sum('total'))['total__sum'] or 0
         sum_deposited_baskets = self.order_baskets.filter(is_deposit=True).aggregate(models.Sum('price_per_unit'))['price_per_unit__sum'] or 0
         return sum_items + sum_deposited_baskets
-    
-    def get_person_name(self):
-        return u'%s' % self.person
-    person_name = property(get_person_name)
-    
+
     def get_paid(self):
         if not self.created:
             return 0
+        
         orders = self.person.orders.filter(created__lt=self.created)
         sum_ordered = orders.aggregate(models.Sum('total'))['total__sum'] or 0
         paid = self.person.paid - sum_ordered
         return min(max(paid, 0), self.total)
-    
-    def get_is_paid(self):
-        return self.paid == self.total
-    is_paid = property(get_is_paid)
+
+    def get_quantity(self):
+        return self.order_items.aggregate(models.Sum('quantity'))['quantity__sum'] or 0
 
 
 class OrderItem(models.Model):
@@ -215,6 +207,7 @@ class OrderItem(models.Model):
     unit            = models.DecimalField(max_digits=9, decimal_places=2)
     total           = models.DecimalField(max_digits=9, decimal_places=2)
     is_deleted      = models.BooleanField(default=False)
+    quantity        = models.PositiveIntegerField(default=0)
     
     class Meta:
         db_table = 'order_items'
@@ -222,22 +215,20 @@ class OrderItem(models.Model):
 
     def __unicode__(self):
         return u'OrderItem %s' % self.product.name
-        
-    def save(self, force_insert=False, force_update=False, using=None):
-        self.total = decimal.Decimal(self.unit) * decimal.Decimal(self.price_per_unit)
-        super(OrderItem, self).save(force_insert, force_update)
     
-    def get_name(self):
+    @property
+    def name(self):
         return u'%s' % self.product.name
-    name = property(get_name)
     
-    def get_quantity(self):
-        return int(max(1, math.ceil(self.unit / self.product.unit)))
-    quantity = property(get_quantity)
-    
-    def get_unit_per_quantity(self):
+    @property
+    def unit_per_quantity(self):
         return self.product.unit
-    unit_per_quantity = property(get_unit_per_quantity)
+
+    def get_total(self):
+        return decimal.Decimal(self.unit) * decimal.Decimal(self.price_per_unit)
+
+    def get_quantity(self):
+        return max(1, math.ceil(self.unit / self.product.unit))
 
 
 class Supply(models.Model):
@@ -265,6 +256,7 @@ class SupplyItem(models.Model):
 
     def __unicode__(self):
         return u'SupplyItem %s' % self.product.name
+
         
 class Basket(models.Model):
     name            = models.CharField(max_length=255, unique=True)
@@ -293,10 +285,54 @@ class BasketOrder(models.Model):
         db_table = 'baskets_orders'
         verbose_name = 'basket_order'
         
-    def get_name(self):
+    @property
+    def name(self):
         return u'%s' % self.basket.name
-    name = property(get_name)
     
-    def get_quantity(self):
+    @property
+    def quantity(self):
         return 0
-    quantity = property(get_quantity)
+
+
+# ==== Signals ================================================================
+
+
+@receiver(pre_save, sender=OrderItem, dispatch_uid='orderitem_pre_save')
+def orderitem_pre_save(sender, instance, **kwargs):
+    instance.total = instance.get_total()
+    instance.quantity = instance.get_quantity()
+
+
+@receiver(post_save, sender=OrderItem, dispatch_uid='orderitem_post_save')
+def orderitem_post_save(sender, instance, **kwargs):
+    instance.order.save()
+
+
+@receiver(pre_save, sender=Order, dispatch_uid='order_pre_save')
+def order_pre_save(sender, instance, **kwargs):
+    instance.total = instance.get_total()
+    instance.paid = instance.get_paid()
+    instance.quantity = instance.get_quantity()
+
+
+@receiver(post_save, sender=Order, dispatch_uid='order_post_save')
+def order_post_save(sender, instance, **kwargs):
+    instance.person.save()
+
+
+@receiver(pre_delete, sender=Payment, dispatch_uid='payment_pre_delete')
+def payment_pre_delete(sender, instance, **kwargs):
+    for basket in instance.return_baskets.all():
+        basket.is_return = False
+        basket.payment = None
+        basket.save()
+
+
+@receiver(pre_save, sender=Person, dispatch_uid='person_pre_save')
+def person_pre_save(sender, instance, **kwargs):
+    instance.ordered_total = instance.get_ordered_total()
+    instance.paid = instance.get_paid()
+    instance.num_outstanding_orders = instance.get_num_outstanding_orders()
+    instance.quantity = instance.get_quantity()
+    instance.outstanding_total = instance.get_outstanding_total()
+    instance.latest_order_date = instance.get_latest_order_date()

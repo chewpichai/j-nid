@@ -1,0 +1,45 @@
+{% load staticfiles %}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>J-NID</title>
+  
+  <script src="{% static "web/js/jquery-1.9.1.min.js" %}"></script>
+  <script src="{% static "web/js/jquery-ui-1.10.2.custom.min.js" %}"></script>
+  <script src="{% static "web/js/base.js" %}"></script>
+  {% block script %}{% endblock %}
+  
+  <link rel="stylesheet" href="{% static "web/css/normalize.css" %}">
+  <link rel="stylesheet" href="{% static "web/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}">
+  <link rel="stylesheet" href="{% static "web/css/base.css" %}">
+  {% block style %}{% endblock %}
+</head>
+<body>
+  <div class="main-wrapper">
+    <header>
+      <div class="menu-btn left bold"><a href="#">รายงาน</a></div>
+      <div class="logo center bold">เจ๊นิด</div>
+    </header>
+
+    <nav class="main-menu">
+        <ul>
+          <li><a href="{% url 'web.daily_sales_report' %}">รายงานยอดซื้อรายวัน</a></li>
+          <li><a href="{% url 'web.daily_transaction_report' %}">รายงานซื้อ-ขายรายวัน</a></li>
+          <li><a href="{% url 'web.monthly_sales_report' %}">รายงานซื้อ-ขายรายเดือน</a></li>
+          <li><a href="{% url 'web.payment_report' %}">รายงานการจ่ายเงิน</a></li>
+          <li><a href="{% url 'web.customer_report' %}">รายงานลูกค้า</a></li>
+        </ul>
+      </nav>
+
+    <div class="content-wrapper">
+      {% block content %}{% endblock content %}
+    </div>
+
+    <div id="dialog"></div>
+  </div>
+</body>
+</html>
