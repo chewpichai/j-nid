@@ -7,6 +7,7 @@ from j_nid.app.views import response_xml
 import decimal
 import datetime
 
+
 def response_json(data):
     response = HttpResponse(mimetype='application/json')
     serializers.serialize('json', data, ensure_ascii=False, stream=response)
@@ -41,7 +42,7 @@ def get_baskets(request):
     return response_json(baskets)
 
 def create_order(request):
-    obj =  simplejson.loads(request.raw_post_data)
+    obj =  simplejson.loads(request.body)
     order = Order.objects.create(notation=obj['notation'],
                 person_id=obj['person'], created=datetime.datetime.now())
     for item in obj['order_items']:

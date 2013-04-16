@@ -1,0 +1,41 @@
+{% load humanize %}
+
+<div class="order-wrapper" name="{{ order.person_name }}">
+	<table class="orderitem-list">
+    <thead>
+      <tr>
+        <th class="quantity">จำนวน</th>
+        <th class="name">รายการ</th>
+        <th class="unit">หน่วย</th>
+        <th class="price">ราคาต่อหน่วย</th>
+        <th class="total">รวม</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for item in order.order_items.all %}
+        <tr>
+          <td class="quantity">{{ item.quantity }}</td>
+          <td class="name">{{ item.name }}</td>
+          <td class="unit">{{ item.unit|floatformat|intcomma }}</td>
+          <td class="price">{{ item.price_per_unit|floatformat|intcomma }}</td>
+          <td class="total">{{ item.total|floatformat|intcomma }}</td>
+        </tr>
+      {% endfor %}
+
+      {% for item in baskets %}
+        <tr>
+          <td class="quantity">{{ item.quantity }}</td>
+          <td class="name">{{ item.name }}</td>
+          <td class="unit">{{ item.unit|floatformat|intcomma }}</td>
+          <td class="price">{{ item.price_per_unit|floatformat|intcomma }}</td>
+          <td class="total">{{ item.total|floatformat|intcomma }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div>หมายเหตุ:</div>
+  <div>{{ order.notation }}</div>
+  <div class="total">รวม: {{ order.total|floatformat|intcomma }}</div>
+</div>

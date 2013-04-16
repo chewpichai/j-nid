@@ -1,0 +1,357 @@
+@font-face {
+	font-family: Roboto;
+	src: url('font/Roboto-Regular.ttf');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url('font/Roboto-Bold.ttf');
+  font-weight: bold;
+	font-style: normal;
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url('font/Roboto-Italic.ttf');
+  font-weight: normal;
+	font-style: italic;
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url('font/Roboto-BoldItalic.ttf');
+  font-weight: bold;
+	font-style: italic;
+}
+
+.red {
+  color: #f00;
+}
+
+.blue {
+  color: #00f;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.center {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+	font-size: 16px;
+	font-family: Roboto;
+  background: #dde0e5;
+}
+
+.main-wrapper {
+  width: 760px;
+  margin: 0 auto;
+  position: relative;
+}
+
+header {
+	height: 34px;
+  background: url('img/header-bg.png') repeat-x;
+  padding: 8px;
+  overflow: hidden;
+}
+
+header .menu-btn {
+  background: url('img/menu-btn.png') no-repeat;
+  width: 100px;
+  height: 34px;
+}
+
+header .menu-btn a {
+  display: block;
+  width: 63px;
+  height: 26px;
+  padding-top: 8px;
+  padding-left: 37px;
+  color: #fff;
+  text-decoration: none;
+  line-height: 1em;
+}
+
+.main-menu {
+  position: absolute;
+  background: rgba(8, 19, 40, 0.85);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 0 8px 0 #000;
+  top: 44px;
+  left: 8px;
+  display: none;
+}
+
+.main-menu ul {
+  list-style-type: none;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.main-menu ul li {
+  padding: 12px;
+  border-bottom: 1px solid #b7b9bd;
+}
+
+.main-menu ul a {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: #000;
+}
+
+.control {
+  height: 26px;
+  background: url('img/control-bg.png') repeat-x;
+  padding: 8px;
+  color: #fff;
+}
+
+.control form {
+  overflow: hidden;
+  float: left;
+}
+
+.control form .field {
+  float: left;
+  margin-right: 16px;
+}
+
+.control form label {
+  font-weight: bold;
+  line-height: 1em;
+}
+
+.control form select,
+.control form input[type=text] {
+  height: 26px;
+  border-radius: 16px;
+  line-height: 1em;
+  padding: 0;
+  padding-left: 8px;
+}
+
+.control form input[type=text] {
+  height: 22px;
+}
+
+.control form input[name$=date] {
+  width: 100px;
+}
+
+.control form input[type=submit] {
+  background: url('img/submit-btn.png') no-repeat;
+  width: 80px;
+  height: 26px;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.content {
+  width: 744px;
+  margin: 8px auto;
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #b7b9bd;
+  padding-bottom: 16px;
+}
+
+.content table {
+  width: 100%;
+}
+
+.content table thead th {
+  border-bottom: 2px solid #b7b9bd;
+}
+
+.content table th,
+.content table td {
+  line-height: 3em;
+  padding: 0 8px;
+}
+
+.content table tbody tr:nth-child(even) {
+  background: #dde0e5;
+}
+
+.content table tbody tr.sum,
+.content table tbody tr.avg {
+  background: transparent;
+}
+
+.content table tbody tr.sum th,
+.content table tbody tr.sum td {
+  border-top: 4px double #b7b9bd;
+  border-bottom: 4px double #b7b9bd;
+}
+
+.content table .date,
+.content table .no {
+  width: 10%;
+  text-align: center;
+}
+
+.content table .quantity,
+.content table .order,
+.content table .payment {
+  width: 30%;
+  text-align: right;
+}
+
+.content table .total {
+  width: 18%;
+  text-align: right;
+  padding-right: 2%;
+}
+
+.content table .time {
+  width: 30%;
+  text-align: center;
+}
+
+.content table .name {
+  width: 40%;
+  text-align: left;
+}
+
+.order-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid #b7b9bd;
+  padding: 8px;
+  font-size: 0.8em;
+}
+
+.order-wrapper .total {
+  margin-top: 8px;
+  text-align: right;
+}
+
+table.orderitem-list {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+table.orderitem-list thead th {
+  border-bottom: 2px solid #b7b9bd;
+}
+
+table.orderitem-list tbody tr:first-child td {
+  padding-top: 12px;
+}
+
+table.orderitem-list th,
+table.orderitem-list td {
+  padding: 4px;
+}
+
+table.orderitem-list .quantity {
+  width: 5%;
+  text-align: center;
+}
+
+table.orderitem-list .unit {
+  width: 12%;
+  text-align: center;
+}
+
+table.orderitem-list .price {
+  width: 12%;
+  text-align: center;
+}
+
+table.orderitem-list .total {
+  width: 15%;
+  text-align: right;
+}
+
+table.orderitem-list caption {
+  text-align: left;
+  font-weight: bold;
+}
+
+#dialog {
+  background: #d4d7dc;
+  border-radius: 8px;
+}
+
+.ui-dialog .ui-dialog-title {
+  line-height: 2em;
+  color: #fff;
+}
+
+.ui-dialog .ui-widget-header {
+  background: none;
+  border: none;
+}
+
+.ui-dialog.ui-widget-content {
+  background: rgba(8, 19, 40, 0.85);
+  border-radius: 16px;
+  padding: 8px;
+  -webkit-box-shadow: 0 0 8px 0 #000;
+  box-shadow: 0 0 8px 0 #000;
+}
+
+.content table caption {
+  line-height: 1.5em;
+  font-weight: bold;
+  padding-left: 16px;
+  text-align: left;
+}
+
+.content table tbody .created {
+  width: 30%;
+}
+
+.content table tbody .order-total {
+  color: #f00;
+  width: 40%;
+}
+
+.content table tbody .payment-amount {
+  color: #00f;
+  width: 40%;
+  text-align: right;
+}
+
+.customer-report {
+  padding: 0 8px;
+}
+
+.customer-report table .sum td:first-child {
+  text-align: right;
+  width: 70%;
+}
+
+.customer-report table {
+  margin-bottom: 16px;
+}
+
+.content table tbody tr.sum.no-border td {
+  border: none;
+}

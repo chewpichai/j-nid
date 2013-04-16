@@ -1,0 +1,60 @@
+{% extends 'web/base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="month-form">
+      <div class="field">
+        <label for="">เดือน:</label>
+        {{ form.month }}
+      </div>
+
+      <div class="field">
+        <label for="">ปี:</label>
+        {{ form.year }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="รายงาน">
+      </div>
+    </form>
+  </div>
+
+  <div class="content">
+    <table>
+      <thead>
+        <tr>
+          <th class="date">วันที่</th>
+          <th class="quantity">จำนวนชิ้น</th>
+          <th class="order">ยอดขาย</th>
+          <th class="payment">ยอดจ่าย</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for row in report %}
+          <tr>
+            <td class="date">{{ row.date|date:'d' }}</td>
+            <td class="quantity">{{ row.quantity|intcomma }}</td>
+            <td class="order">{{ row.total_order|floatformat|intcomma }}</td>
+            <td class="payment">{{ row.total_payment|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+        <tr class="sum">
+          <th>รวม</th>
+          <td class="quantity">{{ sums.quantity|intcomma }}</td>
+          <td class="order">{{ sums.total_order|floatformat|intcomma }}</td>
+          <td class="payment">{{ sums.total_payment|floatformat|intcomma }}</td>
+        </tr>
+
+        <tr class="avg">
+          <th>เฉลี่ย</th>
+          <td class="quantity">{{ avgs.quantity|intcomma }}</td>
+          <td class="order">{{ avgs.total_order|floatformat|intcomma }}</td>
+          <td class="payment">{{ avgs.total_payment|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

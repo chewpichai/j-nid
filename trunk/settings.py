@@ -28,7 +28,7 @@ TIME_ZONE = 'Asia/Bangkok'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'th-th'
 
 SITE_ID = 1
 
@@ -55,9 +55,8 @@ SECRET_KEY = '-g-t#sy&tpd%*g!thoktw08zq_s&$i!5fqi3(yy319@=saac()'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -78,7 +77,15 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.sessions',
-    # 'django.contrib.sites',
-    'j_nid.app'
+    'django.contrib.staticfiles',
+    'south',
+    'j_nid.api',
+    'j_nid.app',
+    'j_nid.web',
 )
+
+STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')

@@ -1,0 +1,57 @@
+{% load humanize %}
+
+<div class="payment-wrapper order-wrapper" name="{{ payment.person_name }}">
+	{% if deposit_baskets %}
+    <table class="basket-list orderitem-list">
+      <caption class="blue">ลังมัดจำ</caption>
+      <thead>
+        <tr>
+          <th class="quantity">จำนวน</th>
+          <th class="name">รายการ</th>
+          <th class="price">ราคาต่อหน่วย</th>
+          <th class="total">รวม</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in deposit_baskets %}
+          <tr>
+            <td class="quantity">{{ item.quantity }}</td>
+            <td class="name">{{ item.name }}</td>
+            <td class="price">{{ item.price|floatformat|intcomma }}</td>
+            <td class="total">{{ item.total|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  {% if  non_deposit_baskets %}
+    <table class="basket-list orderitem-list">
+      <caption class="blue">ลังไม่มัดจำ</caption>
+      <thead>
+        <tr>
+          <th class="quantity">จำนวน</th>
+          <th class="name">รายการ</th>
+          <th class="price">ราคาต่อหน่วย</th>
+          <th class="total">รวม</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in non_deposit_baskets %}
+          <tr>
+            <td class="quantity">{{ item.quantity }}</td>
+            <td class="name">{{ item.name }}</td>
+            <td class="price">{{ item.price|floatformat|intcomma }}</td>
+            <td class="total">{{ item.total|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  <div>หมายเหตุ:</div>
+  <div>{{ payment.notation }}</div>
+  <div class="total">รวม: {{ payment.amount|floatformat|intcomma }}</div>
+</div>

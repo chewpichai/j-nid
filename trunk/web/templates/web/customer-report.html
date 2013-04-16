@@ -1,0 +1,85 @@
+{% extends 'web/base.html' %}
+
+{% load webtags humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="customer-form">
+      <div class="field">
+        <label for="">ชื่อ:</label>
+        {{ form.person }}
+      </div>
+
+      <div class="field">
+        <label for="">เริ่มจาก:</label>
+        {{ form.start_date }}
+      </div>
+
+      <div class="field">
+        <label for="">ถึง:</label>
+        {{ form.end_date }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="รายงาน">
+      </div>
+    </form>
+  </div>
+
+  <div class="content customer-report">
+    <p>วันที่ {{ start_date|date:'d N Y' }} &nbsp;&nbsp;&nbsp;ถึง {{ end_date|date:'d N Y' }}</p>
+    <p>มีรายการซื้อและจ่ายดังนี้</p>
+
+    <table>
+      <tbody>
+        <tr class="sum no-border">
+          <td colspan="2">ยอดยกมา</td>
+          <td class="{% if balance < 0 %}red{% else %}blue{% endif %}">{{ balance|absolute|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="order-list">
+      <caption>ยอดบิลซื้อ</caption>
+      <tbody>
+        {% for order in orders %}
+          <tr order-id="{{ order.pk }}">
+            <td class="created">{{ order.created|date:'d/m/y' }}</td>
+            <td class="order-total">{{ order.total|floatformat|intcomma }} ({{ order.paid|floatformat|intcomma }})</td>
+            <td></td>
+          </tr>
+        {% endfor %}
+        <tr class="sum">
+          <td colspan="2">รวมยอดซื้อ</td>
+          <td class="red">{{ sum_order|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="payment-list">
+      <caption>ยอดจ่าย</caption>
+      <tbody>
+        {% for payment in payments %}
+          <tr payment-id="{{ payment.pk }}">
+            <td class="created">{{ payment.created|date:'d/m/y' }}</td>
+            <td class="payment-amount">{{ payment.amount|floatformat|intcomma }}</td>
+            <td></td>
+          </tr>
+        {% endfor %}
+        <tr class="sum">
+          <td colspan="2">รวมยอดจ่าย</td>
+          <td class="blue">{{ sum_payment|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table>
+      <tbody>
+        <tr class="sum no-border">
+          <td colspan="2">รวมสุทธิ</td>
+          <td class="{% if summary < 0 %}red{% else %}blue{% endif %}">{{ summary|absolute|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}
