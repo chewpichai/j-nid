@@ -8,7 +8,6 @@ class Command(BaseCommand):
             orderitems = OrderItem.objects.all()
             
             for orderitem in orderitems:
-                orderitem.total = orderitem.get_total()
                 orderitem.quantity = orderitem.get_quantity()
                 orderitem.save()
 
@@ -18,8 +17,6 @@ class Command(BaseCommand):
             orders = Order.objects.all()
 
             for order in orders:
-                order.total = order.get_total()
-                order.paid = order.get_paid()
                 order.quantity = order.get_quantity()
                 order.save()
 
