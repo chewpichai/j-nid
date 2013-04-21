@@ -38,6 +38,6 @@ class PaymentReportForm(forms.Form):
 
 
 class CustomerReportForm(forms.Form):
-    person = forms.ModelChoiceField(queryset=Person.objects.filter(num_outstanding_orders__gt=0))
+    person = forms.ModelChoiceField(queryset=Person.objects.exclude(outstanding_total=0))
     start_date = forms.DateField(input_formats=['%d-%m-%Y'])
     end_date = forms.DateField(input_formats=['%d-%m-%Y'])
