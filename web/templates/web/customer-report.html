@@ -45,7 +45,7 @@
         {% for order in orders %}
           <tr order-id="{{ order.pk }}">
             <td class="created">{{ order.created|date:'d/m/y' }}</td>
-            <td class="order-total">{{ order.total|floatformat|intcomma }} ({{ order.paid|floatformat|intcomma }})</td>
+            <td class="order-total">{{ order.total|floatformat|intcomma }}</td>
             <td></td>
           </tr>
         {% endfor %}

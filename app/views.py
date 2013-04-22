@@ -324,7 +324,6 @@ class OrderController(Controller):
                 order_item = OrderItem(order=order)
             
             update_model(order_item, item)
-            print 'order_item = %s' % order_item
         
         order.order_baskets.filter(is_deposit=False).delete()
         
@@ -376,7 +375,8 @@ class OrderController(Controller):
         if self.xml.order.paid:
             created = order.created + datetime.timedelta(seconds=30)
             payment = Payment.objects.create(person=order.person,
-                amount=toSimpleString(self.xml.order.paid), created=created)
+                                             amount=toSimpleString(self.xml.order.paid),
+                                             created=created)
             amount = decimal.Decimal(payment.amount)
             
             for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):

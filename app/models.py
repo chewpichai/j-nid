@@ -320,6 +320,11 @@ def order_post_save(sender, instance, **kwargs):
     instance.person.save()
 
 
+@receiver(post_save, sender=Payment, dispatch_uid='payment_post_save')
+def payment_post_save(sender, instance, **kwargs):
+    instance.person.save()
+
+
 @receiver(pre_delete, sender=Payment, dispatch_uid='payment_pre_delete')
 def payment_pre_delete(sender, instance, **kwargs):
     for basket in instance.return_baskets.all():
