@@ -156,8 +156,7 @@ def get_daily_transaction_report(request):
 
 
 def get_dashboard(request):
-  # today = datetime.date.today()
-  today = datetime.date(2013, 3, 31)
+  today = datetime.date.today()
   yesterday = today - datetime.timedelta(days=1)
   summary = SummaryData(today)
   yesterday_summary = SummaryData(yesterday)
