@@ -43,7 +43,7 @@ class SummaryData(object):
 		for hour, items in self.hours.items():
 			self.hoursjson[hour] = sum([item.total for item in items])
 
-		self.hoursjson = simplejson.dumps(self.hoursjson)
+		self.hoursjson = simplejson.dumps(self.hoursjson, use_decimal=True)
 		self.productsjson = [[stat['product'].name, stat['quantity']] for stat in self.productstats[:6]]
 		self.productsjson.append([u'อื่นๆ', sum([stat['quantity'] for stat in self.productstats[6:]])])
-		self.productsjson = simplejson.dumps(self.productsjson)
+		self.productsjson = simplejson.dumps(self.productsjson, use_decimal=True)
