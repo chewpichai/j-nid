@@ -1,0 +1,68 @@
+{% extends 'web/base.html' %}
+
+{% load staticfiles humanize %}
+
+{% block script %}
+  <script src="{% static "web/js/highcharts.js" %}"></script>
+  <script src="{% static "web/js/dashboard.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="control">วันที่ {{ today|date:'d F Y' }}</div>
+
+  <div class="content">
+    <table class="summary">
+      <thead>
+        <tr>
+          <th>จำนวนชิ้น</th>
+          <th>ยอดขาย</th>
+          <th>ยอดรับชำระ</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>{{ summary.quantity }}</td>
+          <td class="red">{{ summary.total|floatformat|intcomma }}</td>
+          <td class="blue">{{ summary.paid|floatformat|intcomma }}</td>
+        </tr>
+
+        <tr>
+          <td>{% if quantity_diff > 0 %}+{% endif %}{{ quantity_diff }}</td>
+          <td class="red">{% if total_diff > 0 %}+{% endif %}{{ total_diff|floatformat|intcomma }}</td>
+          <td class="blue">{% if paid_diff > 0 %}+{% endif %}{{ paid_diff|floatformat|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="hour-stat-chart" data="{{ summary.hoursjson }}"></div>
+
+    <div id="product-stat-chart" data="{{ summary.productsjson }}"></div>
+
+    <table class="product-stats">
+      <thead>
+        <tr>
+          <th>สินค้า</th>
+          <th>ราคาต่ำสุด</th>
+          <th>ราคาสูงสุด</th>
+          <th>ราคาเฉลี่ย</th>
+          <th>จำนวนชิ้น</th>
+          <th>ยอดขาย</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for stat in summary.productstats %}
+          <tr>
+            <td>{{ stat.product.name }}</td>
+            <td>{{ stat.min_price|floatformat|intcomma }}</td>
+            <td>{{ stat.max_price|floatformat|intcomma }}</td>
+            <td>{{ stat.avrg_price|floatformat|intcomma }}</td>
+            <td>{{ stat.quantity }}</td>
+            <td>{{ stat.total|floatformat|intcomma }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}
