@@ -1,13 +1,8 @@
 from django.conf.urls import *
-from django.views.generic import RedirectView
 
 
-urlpatterns = patterns('',
-    url(r'^$', RedirectView.as_view(url='daily-sales-report'), name='web.index'),
-)
-
-
-urlpatterns += patterns('j_nid.web.views',
+urlpatterns = patterns('j_nid.web.views',
+	url(r'^$', 'get_dashboard', name='web.index'),
     url(r'^customer-report/$', 'get_customer_report', name='web.customer_report'),
     url(r'^daily-sales-report/$', 'get_daily_sales_report', name='web.daily_sales_report'),
     url(r'^daily-transaction-report/$', 'get_daily_transaction_report', name='web.daily_transaction_report'),

@@ -2,6 +2,7 @@ from django.db.models import Sum
 from django.shortcuts import render
 from j_nid.app.models import *
 from j_nid.web.forms import *
+from j_nid.web.helpers import *
 import datetime
 
 
@@ -152,3 +153,15 @@ def get_daily_transaction_report(request):
         transactions.sort(key=lambda t: t.created, reverse=False)
 
     return render(request, 'web/daily-transaction-report.html', locals())
+
+
+def get_dashboard(request):
+  # today = datetime.date.today()
+  today = datetime.date(2013, 3, 31)
+  yesterday = today - datetime.timedelta(days=1)
+  summary = SummaryData(today)
+  yesterday_summary = SummaryData(yesterday)
+  quantity_diff = summary.quantity - yesterday_summary.quantity
+  total_diff = summary.total - yesterday_summary.total
+  paid_diff = summary.paid - yesterday_summary.paid
+  return render(request, 'web/dashboard.html', locals())
