@@ -20,7 +20,7 @@ MONTH_LIST = ((1, u'มกราคม'),
               (11, u'พฤศจิกายน'),
               (12, u'ธันวาคม'))
 
-YEAR_LIST = [(y, y) for y in range(NOW.year, 2009, -1)] 
+YEAR_LIST = [(y, y) for y in range(NOW.year, 2009, -1)]
 
 
 class MonthlyForm(forms.Form):
@@ -41,3 +41,11 @@ class CustomerReportForm(forms.Form):
     person = forms.ModelChoiceField(queryset=Person.objects.exclude(outstanding_total=0))
     start_date = forms.DateField(input_formats=['%d-%m-%Y'])
     end_date = forms.DateField(input_formats=['%d-%m-%Y'])
+
+
+class CustomerSearchForm(forms.Form):
+    name = forms.CharField()
+
+    def get_customers(self):
+      name = self.cleaned_data['name']
+      return Person.objects.filter(name__contains=name)
