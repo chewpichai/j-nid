@@ -8,7 +8,7 @@ import datetime
 
 def get_monthly_sales_report(request):
     form = MonthlyForm(request.GET)
-    
+
     if form.is_valid():
         month = form.cleaned_data['month']
         year = form.cleaned_data['year']
@@ -17,7 +17,7 @@ def get_monthly_sales_report(request):
         sum_order = 0
         sum_payment = 0
         report = []
-        
+
         while 1:
             orders = Order.objects.filter(created__day=date.day,
                                           created__month=date.month,
@@ -44,13 +44,13 @@ def get_monthly_sales_report(request):
         avgs = {'quantity': sum_quantity / len(report),
                 'total_order': sum_order / len(report),
                 'total_payment': sum_payment / len(report)}
-    
+
     return render(request, 'web/monthly-sales-report.html', locals())
 
 
 def get_daily_sales_report(request):
     form = DailyForm(request.GET)
-    
+
     if form.is_valid():
         date = form.cleaned_data['date']
         orders = Order.objects.filter(created__day=date.day,
@@ -89,8 +89,23 @@ def get_customer_report(request):
         sum_order = orders.aggregate(Sum('total'))['total__sum'] or 0
         sum_payment = payments.aggregate(Sum('amount'))['amount__sum'] or 0
         summary = balance + (sum_payment - sum_order)
+        end_date = form.cleaned_data['end_date']
 
     return render(request, 'web/customer-report.html', locals())
+
+
+def get_customer_search(request):
+    form = CustomerSearchForm(request.GET)
+
+    if form.is_valid():
+      customers = form.get_customers()
+
+    return render(request, 'web/customer-search.html', locals())
+
+
+def get_customer_detail(request, id):
+    customer = Person.objects.get(pk=id)
+    return render(request, 'web/customer-detail.html', locals())
 
 
 def get_order(request, id):
@@ -140,7 +155,7 @@ def get_payment(request, id):
 
 def get_daily_transaction_report(request):
     form = DailyForm(request.GET)
-    
+
     if form.is_valid():
         date = form.cleaned_data['date']
         orders = Order.objects.filter(created__day=date.day,

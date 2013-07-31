@@ -1,0 +1,38 @@
+{% extends 'web/base.html' %}
+
+{% load webtags humanize %}
+
+{% block content %}
+  <div class="content">
+    <table class="customer-detail">
+      <tbody>
+        <tr>
+          <th>ชื่อ:</th>
+          <td>{{ customer.name }}</td>
+        </tr>
+        <tr>
+          <th>ที่อยู่:</th>
+          <td>{{ customer.address }}</td>
+        </tr>
+        <tr>
+          <th>เบอร์โทร:</th>
+          <td>
+            <ol>
+              {% for phone in customer.phone_numbers.all %}
+                <li>{{ phone.number }}</li>
+              {% endfor %}
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <th>รายละเอียด:</th>
+          <td>{{ customer.detail1 }}</td>
+        </tr>
+        <tr>
+          <th>B/C:</th>
+          <td><a href="{{ customer.get_account_url }}">ยอด B/C</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

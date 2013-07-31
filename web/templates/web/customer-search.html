@@ -1,0 +1,26 @@
+{% extends 'web/base.html' %}
+
+{% load webtags humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="customer-form">
+      <div class="field">
+        <label for="">ชื่อ:</label>
+        {{ form.name }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="ค้นหา">
+      </div>
+    </form>
+  </div>
+
+  <div class="content">
+    <ul class="customer-list">
+      {% for customer in customers %}
+        <li><a href="{{ customer.get_absolute_url }}">{{ customer.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock content %}
