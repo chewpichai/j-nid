@@ -141,6 +141,12 @@ header .menu-btn a {
   margin-right: 16px;
 }
 
+.control form .field ul li {
+  float: left;
+  margin-right: 16px;
+  list-style: none;
+}
+
 .control form label {
   font-weight: bold;
   line-height: 1em;
@@ -393,10 +399,90 @@ table.product-stats td {
 }
 
 ul.customer-list {
-  list-style: none;
   padding: 8px;
 }
 
 ul.customer-list li {
   list-style: none;
+}
+
+ul.product-list {
+  overflow: hidden;
+}
+
+ul.product-list li {
+  list-style: none;
+  padding: 8px;
+  margin-left: 8px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  width: 344px;
+  float: left;
+}
+
+ul.product-list li.product a {
+  color: #000;
+  text-decoration: none;
+}
+
+ul.product-list li.product h3 {
+  margin: 4px 0;
+}
+
+ul.product-list li.product .price {
+  font-weight: bold;
+  color: #00f;
+}
+
+ul.product-list li.product .cost {
+  font-size: 0.82em;
+  margin-left: 8px;
+}
+
+#price-editor {
+  display: none;
+  background: #fff;
+  padding: 8px 32px;
+  border-radius: 8px;
+}
+
+#price-editor h3 {
+  margin: 12px 0;
+  text-align: center;
+}
+
+#price-editor form .field {
+  margin-bottom: 8px;
+}
+
+#price-editor form .field label {
+  display: inline-block;
+  width: 80px;
+  text-align: right;
+  padding-right: 8px;
+}
+
+#price-editor form input[type=text] {
+  width: 80px;
+}
+
+#loading {
+  background: url('img/loading.gif');
+  width: 50px !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  display: none;
+  padding: 0;
+}
+
+.ui-dialog[aria-describedby=loading] {
+  width: 50px !important;
+  height: 50px !important;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.ui-dialog[aria-describedby=loading] .ui-dialog-titlebar {
+  display: none;
 }

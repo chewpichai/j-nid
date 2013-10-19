@@ -1,0 +1,54 @@
+{% extends 'web/base.html' %}
+
+{% load webtags humanize %}
+
+{% block content %}
+  <div class="control">
+    <form class="product-form">
+      <div class="field">
+        {{ form.is_sale }}
+      </div>
+
+      <div class="field">
+        <label>ชนิดสินค้า:</label>
+        {{ form.product_type }}
+      </div>
+
+      <div class="field">
+        <input type="submit" value="ตกลง">
+      </div>
+    </form>
+  </div>
+
+  <div class="content">
+    <ul class="product-list">
+      {% for product in products %}
+        <li class="product" product-id="{{ product.pk }}" style="border-color:{{ product.color_hex }};">
+          <a href="#price-editor">
+            <h3 style="color:{{ product.color_hex }};">{{ product.name }}</h3>
+            <div>
+              <span class="price" value="{{ product.price_per_unit }}">{{ product.price_per_unit|floatformat|intcomma }}</span>
+              <span class="cost" value="{{ product.cost_per_unit }}">{{ product.cost_per_unit|floatformat|intcomma }}</span>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id="price-editor">
+    <form>
+      <input type="hidden" name="pk">
+
+      <div class="field">
+        <label>ราคาขาย</label>
+        <input type="text" name="price">
+      </div>
+
+      <div class="field">
+        <label>ราคาทุน</label>
+        <input type="text" name="cost">
+      </div>
+    </form>
+  </div>
+{% endblock content %}

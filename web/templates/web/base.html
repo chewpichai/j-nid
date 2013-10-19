@@ -21,6 +21,8 @@
   {% block style %}{% endblock %}
 </head>
 <body>
+  <div id="loading"></div>
+
   <div class="main-wrapper">
     <header>
       <div class="menu-btn left bold"><a href="#sidr">รายงาน</a></div>
@@ -35,6 +37,7 @@
         <li><a href="{% url 'web.payment_report' %}">รายงานการจ่ายเงิน</a></li>
         <li><a href="{% url 'web.customer_report' %}">รายงานลูกค้า</a></li>
         <li><a href="{% url 'web.customer_search' %}">ข้อมูลลูกค้า</a></li>
+        <li><a href="{% url 'web.product_list' %}">ข้อมูลสินค้า</a></li>
       </ul>
     </nav>
 

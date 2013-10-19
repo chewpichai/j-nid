@@ -168,6 +168,10 @@ class Product(models.Model):
     def color(self):
         return self.type.color
 
+    @property
+    def color_hex(self):
+        return '#%s' % hex(self.type.color)[2:-1]
+
 
 class Order(models.Model):
     person      = models.ForeignKey(Person, related_name='orders')
