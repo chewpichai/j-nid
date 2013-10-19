@@ -1,7 +1,9 @@
 from django.contrib import auth
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden
-from django.utils import simplejson
+from django.shortcuts import get_object_or_404
+from django.template import Context, Template
+from django.utils import simplejson as json
 from j_nid.app.models import *
 from j_nid.app.views import response_xml
 import decimal
@@ -12,6 +14,11 @@ def response_json(data):
     response = HttpResponse(mimetype='application/json')
     serializers.serialize('json', data, ensure_ascii=False, stream=response)
     return response
+
+
+def format_number(num):
+    t = Template("{% load humanize %}{{ num|floatformat|intcomma }}")
+    return t.render(Context({'num': num}))
 
 # =============================================================================
 
@@ -33,6 +40,21 @@ def get_products(request):
     products = Product.objects.filter(is_sale=True)
     return response_json(products)
 
+
+def get_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+
+    if request.method == 'POST':
+        product.price_per_unit = decimal.Decimal(request.POST.get('price'))
+        product.cost_per_unit = decimal.Decimal(request.POST.get('cost'))
+        product.save()
+        data = {'pk': product.pk, 'price': product.price_per_unit,
+                'formated_price': format_number(product.price_per_unit),
+                'cost': product.cost_per_unit,
+                'formated_cost': format_number(product.cost_per_unit)}
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 def get_customers(requset):
     customers = Person.objects.filter(is_customer=True).order_by('name')
     return response_json(customers)
@@ -42,7 +64,7 @@ def get_baskets(request):
     return response_json(baskets)
 
 def create_order(request):
-    obj =  simplejson.loads(request.body)
+    obj =  json.loads(request.body)
     order = Order.objects.create(notation=obj['notation'],
                 person_id=obj['person'], created=datetime.datetime.now())
     for item in obj['order_items']:

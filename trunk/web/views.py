@@ -179,3 +179,19 @@ def get_dashboard(request):
   total_diff = summary.total - yesterday_summary.total
   paid_diff = summary.paid - yesterday_summary.paid
   return render(request, 'web/dashboard.html', locals())
+
+
+def list_product(request):
+  data = request.GET.copy()
+
+  if data.get('is_sale', None) == None: data['is_sale'] = 1
+
+  form = ProductSearchForm(data)
+
+  if form.is_valid():
+    is_sale = form.cleaned_data['is_sale']
+    products = Product.objects.filter(is_sale=is_sale)
+    product_type = form.cleaned_data['product_type']
+    if product_type: products = products.filter(type=product_type)
+
+  return render(request, 'web/product-list.html', locals())

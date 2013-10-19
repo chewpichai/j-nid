@@ -10,6 +10,10 @@ $(function() {
     // });
 
     $('.menu-btn a').sidr();
+
+    $('ul.product-list li.product a').click(showPriceEditor);
+
+    $('#price-editor form').submit(priceEditorSubmit);
 });
 
 function showOrder() {
@@ -34,4 +38,44 @@ function showPayment() {
             width: 600
         });
     });
+}
+
+function showPriceEditor() {
+    var $li = $(this).closest('li'),
+        pk = $li.attr('product-id'),
+        price = $li.find('.price').attr('value'),
+        cost = $li.find('.cost').attr('value'),
+        name = $li.find('h3').text();
+
+    $('#price-editor').attr('title', name);
+
+    $('#price-editor').dialog({
+        modal: true,
+        open: function(event, ui) {
+            $('#price-editor').find('input[name=pk]').val(pk);
+            $('#price-editor').find('input[name=price]').val(price);
+            $('#price-editor').find('input[name=cost]').val(cost);
+        },
+        close: function(event, ui) {
+            $('#price-editor form').submit();
+        }
+    });
+    return false;
+}
+
+function priceEditorSubmit() {
+    var data = $(this).serialize(),
+        pk = this['pk'].value;
+
+    $('#loading').dialog({modal: true});
+
+    $.post('/api/products/' + pk + '/', data, function(response) {
+        var $li = $('li.product[product-id=' + response.pk + ']');
+
+        $li.find('.price').attr('value', response.price).text(response.formated_price);
+        $li.find('.cost').attr('value', response.cost).text(response.formated_cost);
+        $li.hide().fadeIn();
+        $('#loading').dialog('close');
+    });
+    return false;
 }

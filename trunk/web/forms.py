@@ -1,6 +1,6 @@
 # coding=utf8
 from django import forms
-from j_nid.app.models import Person
+from j_nid.app.models import Person, ProductType
 import datetime
 
 
@@ -49,3 +49,10 @@ class CustomerSearchForm(forms.Form):
     def get_customers(self):
       name = self.cleaned_data['name']
       return Person.objects.filter(name__contains=name)
+
+class ProductSearchForm(forms.Form):
+    SALE_CHOICES = ((1, u'มีขาย'),
+                    (0, u'ไม่มีขาย'))
+
+    is_sale = forms.ChoiceField(required=False, widget=forms.RadioSelect, choices=SALE_CHOICES)
+    product_type = forms.ModelChoiceField(required=False, queryset=ProductType.objects)

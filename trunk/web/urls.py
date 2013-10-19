@@ -12,4 +12,5 @@ urlpatterns = patterns('j_nid.web.views',
     url(r'^payment-report/$', 'get_payment_report', name='web.payment_report'),
     url(r'^order/(?P<id>\d+)/$', 'get_order', name='web.order'),
     url(r'^payment/(?P<id>\d+)/$', 'get_payment', name='web.payment'),
+    url(r'^product/$', 'list_product', name='web.product_list'),
 )
