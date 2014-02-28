@@ -1,0 +1,7 @@
+{% for product in products %}
+	<li product-type-id="{{ product.type.pk }}"><a href="#" product-id="{{ product.pk }}" unit="{{ product.unit }}" price-per-unit="{{ product.price_per_unit }}">{{ product.name }}</a></li>
+{% endfor %}
+
+{% for basket in baskets %}
+	<li product-type-id="basket"><a href="#" product-id="{{ basket.pk }}" unit="{{ basket.unit }}" price-per-unit="{{ basket.price_per_unit }}">{{ basket.name }}</a></li>
+{% endfor %}
