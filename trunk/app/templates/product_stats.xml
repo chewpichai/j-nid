@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<product_stats name="{{ name }}">
+<product_stats name="{{ name }}" num_stats="{{ stats|length }}">
 {% for stat in stats %}
     <stat quantity="{{ stat.quantity }}" price_per_unit="{{ stat.price_per_unit }}" />
 {% endfor %}

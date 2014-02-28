@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     (r'^api/', include('j_nid.api.urls')),
     (r'^j-nid/', include('j_nid.app.urls')),
     (r'^web/', include('j_nid.web.urls')),
+    (r'^ipad/', include('j_nid.ipad.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
