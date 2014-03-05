@@ -114,6 +114,15 @@ footer p {
   margin: 20px 0;
 }
 
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  padding: 1em 8px;
+}
+
 .order-form th {
   text-align: center;
   font-weight: normal;
@@ -144,4 +153,26 @@ footer p {
 .table-bordered > tfoot > tr > td {
   border: none;
   padding-top: 30px;
+}
+
+#id-note {
+  height: 8em;
+}
+
+#add-product-btn {
+  padding: 1em 1.5em;
+}
+
+.remove-product-btn-wrapper {
+  position: relative;
+  display: none;
+}
+
+.remove-product-btn {
+  position: absolute;
+  font-size: 2em;
+  top: 50%;
+  left: 4px;
+  margin-top: -0.5em;
+  color: #f00;
 }
