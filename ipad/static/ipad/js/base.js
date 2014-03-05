@@ -8,6 +8,7 @@ $(function() {
   $('.order-form').on('click', 'a[href=#qty]', quantityClick);
   $('.order-form').on('click', 'a[href=#unit]', unitClick);
   $('.order-form').on('click', 'a[href=#price]', priceClick);
+  $('.order-form').on('click', 'a.remove-product-btn', removeBtnClick);
 });
 
 
@@ -59,8 +60,9 @@ function productClick() {
 }
 
 
-function addProduct(elm, is_pledge=false) {
-  var product_id = $(elm).attr('product-id'),
+function addProduct(elm, is_pledge) {
+  var is_pledge = typeof is_pledge !== 'undefined' ? is_pledge : false;
+      product_id = $(elm).attr('product-id'),
       product_type_id = $(elm).closest('[product-type-id]').attr('product-type-id'),
       name = $(elm).text(),
       unit = parseFloat($(elm).attr('unit')),
@@ -109,10 +111,24 @@ function addProduct(elm, is_pledge=false) {
     output.push('<td class="name">' + name + '</td>');
     output.push('<td><a href="#unit" default="' + unit + '">' + unit + '</a></td>');
     output.push('<td><a href="#price" default="' + price_per_unit + '">' + price_per_unit + '</a></td>');
-    output.push('<td class="total">' + total + '</td>');
+    output.push('<td class="total">' + total + '<span class="remove-product-btn-wrapper"><a href="#remove" class="remove-product-btn"><span class="glyphicon glyphicon-remove-circle"></span></a></span></td>');
     output.push('</tr>');
 
-    $('.order-form tbody').append($(output.join('')));
+    $(output.join('')).appendTo('.order-form tbody').addClass('animated pulse').swipe({
+      swipe: function(event, direction, distance, duration, fingerCount) {
+        var $tr = $(event.currentTarget);
+
+        if (direction == 'left') {
+          $tr.find('.remove-product-btn-wrapper').show();
+          $tr.find('.remove-product-btn').addClass('animated bounceInRight');  
+        } else if (direction == 'right') {
+          $tr.find('.remove-product-btn').addClass('animated bounceOutRight').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+            $tr.find('.remove-product-btn-wrapper').hide();
+            $(this).removeClass('animated bounceOutRight bounceInRight');
+          });
+        }
+      },
+    });
   }
   
   updateSummary();
@@ -257,3 +273,11 @@ BootstrapDialog.basket_confirm = function(elm) {
     }]
   }).open();
 };
+
+
+function removeBtnClick() {
+  $(this).closest('tr').addClass('animated bounceOut').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+    $(this).remove();
+  });
+  return false;
+}
