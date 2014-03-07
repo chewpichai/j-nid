@@ -9,6 +9,8 @@ $(function() {
   $('.order-form').on('click', 'a[href=#unit]', unitClick);
   $('.order-form').on('click', 'a[href=#price]', priceClick);
   $('.order-form').on('click', 'a.remove-product-btn', removeBtnClick);
+
+  $('select[name=customer]').combobox();
 });
 
 
@@ -111,11 +113,12 @@ function addProduct(elm, is_pledge) {
     output.push('<td class="name">' + name + '</td>');
     output.push('<td><a href="#unit" default="' + unit + '">' + unit + '</a></td>');
     output.push('<td><a href="#price" default="' + price_per_unit + '">' + price_per_unit + '</a></td>');
-    output.push('<td class="total">' + total + '<span class="remove-product-btn-wrapper"><a href="#remove" class="remove-product-btn"><span class="glyphicon glyphicon-remove-circle"></span></a></span></td>');
+    output.push('<td><div class="total-wrapper"><span class="total">' + total + '</span><div class="remove-product-btn-wrapper"><a href="#remove" class="remove-product-btn"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>');
     output.push('</tr>');
 
     $(output.join('')).appendTo('.order-form tbody').addClass('animated pulse').swipe({
       swipe: function(event, direction, distance, duration, fingerCount) {
+        console.log(direction);
         var $tr = $(event.currentTarget);
 
         if (direction == 'left') {

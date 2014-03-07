@@ -51,12 +51,11 @@ body {
 
 .product-type-list-wrapper,
 .product-list-wrapper {
-  height: 3.5em;
   overflow: auto;
 }
 
 .product-list-wrapper {
-  height: 21em;
+  height: 40em;
   margin-top: 2.5em;
 }
 
@@ -65,7 +64,6 @@ body {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  height: 3.5em;
 }
 
 .product-type-list li,
@@ -77,7 +75,7 @@ body {
 
 .product-list li {
   width: 20%;
-  height: 6em;
+  height: 8em;
   margin-right: 0;
   border: 1px solid #fff;
   overflow: hidden;
@@ -95,19 +93,15 @@ body {
   text-align: center;
   width: 100%;
   height: 100%;
-  padding: 0 12px;
-  line-height: 3.5em;
-}
-
-.product-list li a {
+  padding: 1.5em;
   line-height: 1.5em;
-  padding-top: 1.5em;
 }
 
 footer {
   font-size: 12px;
   position: fixed;
   bottom: 0;
+  background: #fff;
 }
 
 footer p {
@@ -163,16 +157,28 @@ footer p {
   padding: 1em 1.5em;
 }
 
-.remove-product-btn-wrapper {
+.total-wrapper {
   position: relative;
+}
+
+.remove-product-btn-wrapper {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 2em;
+  height: 2em;
   display: none;
 }
 
 .remove-product-btn {
-  position: absolute;
   font-size: 2em;
-  top: 50%;
-  left: 4px;
-  margin-top: -0.5em;
+  line-height: 1em;
   color: #f00;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-dialog {
+  width: 700px;
 }
