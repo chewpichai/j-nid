@@ -3,12 +3,11 @@
 {% block content %}
 <div class="order-form-controls row">
   <div class="col-sm-6">
-    <input type="text" name="customer" class="form-control" placeholder="ชื่อลูกค้า" list="customers">
-    <datalist id="customers">
+    <select name="customer">
     {% for customer in customers %}
-      <option value="{{ customer }}" />
+      <option value="{{ customer.pk }}">{{ customer }}</option>
     {% endfor %}
-    </datalist>
+    </select>
   </div>
   
   <div class="col-sm-6">
