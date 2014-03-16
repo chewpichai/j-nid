@@ -147,6 +147,10 @@ class ProductType(models.Model):
     def __unicode__(self):
         return u'%s' % self.name
 
+    @property
+    def color_hex(self):
+        return '#%s' % hex(self.color)[2:-1]
+
 
 class Product(models.Model):
     name            = models.CharField(max_length=255)
@@ -170,7 +174,7 @@ class Product(models.Model):
 
     @property
     def color_hex(self):
-        return '#%s' % hex(self.type.color)[2:-1]
+        return self.type.color_hex
 
 
 class Order(models.Model):
