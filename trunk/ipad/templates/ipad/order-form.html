@@ -3,15 +3,15 @@
 {% block content %}
 <div class="order-form-controls row">
   <div class="col-sm-6">
-    <select name="customer">
+    <select id="id-customer" name="customer">
     {% for customer in customers %}
-      <option value="{{ customer.pk }}">{{ customer }}</option>
+      <option value="{{ customer.pk }}" data-outstanding="{{ customer.outstanding_total }}">{{ customer }}</option>
     {% endfor %}
     </select>
   </div>
   
   <div class="col-sm-6">
-    
+    <p class="outstanding-wrapper">ยอดค้างชำระ: <span class="outstanding"></span></p>
   </div>
 </div>
 
@@ -44,12 +44,14 @@
   </tfoot>
 </table>
 
+<div class="submit-wrapper"><button id="order-submit-btn" type="submit" class="btn btn-default">ชำระเงิน</button></div>
+
 <div class="hide">
   <div class="product-dialog">
     <div class="product-type-list-wrapper">
       <ul class="product-type-list">
       {% for product_type in product_types %}
-        <li><a href="#" product-type-id="{{ product_type.pk }}">{{ product_type }}</a></li>
+        <li><a href="#" product-type-id="{{ product_type.pk }}" style="background:{{ product_type.color_hex }};">{{ product_type }}</a></li>
       {% endfor %}
         <li><a href="#" product-type-id="basket">ตระกร้า</a></li>
       </ul>
@@ -75,6 +77,14 @@
   <div class="price-dialog">
     <label>ราคา</label>
     <input type="number" name="price" class="form-control">
+  </div>
+
+  <div class="payment-dialog">
+    <p class="outstanding-wrapper">ยอดค้างชำระ: <span class="outstanding"></span></p>
+    <p>รวม: <span class="summary"></span></p>
+    <p>ชิ้น: <span class="quantity"></span></p>
+    <label>รับชำระจำนวน</label>
+    <input type="number" name="payment" class="form-control">
   </div>
 </div>
 {% endblock content %}

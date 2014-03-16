@@ -95,17 +95,21 @@ body {
   height: 100%;
   padding: 1.5em;
   line-height: 1.5em;
+  color: #fff;
 }
 
 footer {
   font-size: 12px;
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
   background: #fff;
 }
 
 footer p {
-  margin: 20px 0;
+  margin: 0;
+  padding: 20px;
 }
 
 .table > thead > tr > th,
@@ -179,6 +183,65 @@ footer p {
   height: 100%;
 }
 
-.modal-dialog {
-  width: 700px;
+.container {
+  overflow: hidden;
+}
+
+.outstanding-wrapper {
+  text-align: right;
+  padding: 3px 2px;
+}
+
+.outstanding {
+  color: #00f;
+  font-family: 'Sukhumvit Bold';
+}
+
+.outstanding.red {
+  color: #f00;
+}
+
+input[name=quantity],
+input[name=price],
+input[name=unit] {
+  font-size: 3em;
+  height: 2em;
+  width: 30%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.submit-wrapper {
+  text-align: right;
+}
+
+.quantity-dialog,
+.unit-dialog,
+.price-dialog {
+  text-align: center;
+}
+
+.payment-dialog {
+  font-size: 1.5em;
+  line-height: 1.25em;
+  text-align: center;
+}
+
+.payment-dialog .outstanding-wrapper {
+  text-align: center;
+}
+
+.payment-dialog input[name=payment] {
+  font-size: 1.5em;
+  height: 2em;
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+@media (min-width: 768px) {
+  .modal-dialog {
+    width: 680px;
+  }
 }
