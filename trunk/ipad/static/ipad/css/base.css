@@ -119,12 +119,22 @@ footer p {
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
   padding: 1em 8px;
+  position: relative;
 }
 
 .order-form th {
   text-align: center;
   font-weight: normal;
   font-family: 'Sukhumvit Bold';
+}
+
+.order-form a {
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 1em 8px;
 }
 
 .order-form .name {
@@ -174,13 +184,14 @@ footer p {
   display: none;
 }
 
-.remove-product-btn {
+.order-form .remove-product-btn {
   font-size: 2em;
   line-height: 1em;
   color: #f00;
   display: block;
   width: 100%;
   height: 100%;
+  padding: 0;
 }
 
 .container {
@@ -237,6 +248,10 @@ input[name=unit] {
   width: 50%;
   margin: 0 auto;
   text-align: center;
+}
+
+.main-wrapper {
+  margin-bottom: 56px;
 }
 
 
