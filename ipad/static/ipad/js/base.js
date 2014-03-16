@@ -16,6 +16,10 @@ $(function() {
   $('#order-submit-btn').click(orderSubmitClick);
 
   $('#id-note').val('').data('baskets', {});
+
+  $('body').on('click', '[name=quantity],[name=unit],[name=price],[name=payment]', function() {
+    this.select();
+  });
 });
 
 
@@ -382,17 +386,22 @@ function orderSubmitClick() {
       label: 'บันทึก',
       action: function(dialog) {
         data.paid = parseFloat($(dialog.getMessage()).find('input[name=payment]').val());
+        data.paid = isNaN(data.paid)? 0:data.paid;
         $.post('/api/orders/create/', JSON.stringify(data), function(response) {
-          // dialog.close();
+          dialog.close();
+          $('#loading').modal();
           location.reload();
         });
       }
     }],
     onshow: function(dialog) {
+      var summary = 0;
+
       if (data.person <= 24) {
-        var summary = $(dialog.getMessage()).find('.summary').html();
-        $(dialog.getMessage()).find('input[name=payment]').val(summary);
+        summary = $(dialog.getMessage()).find('.summary').html();
       }
+      
+      $(dialog.getMessage()).find('input[name=payment]').val(summary);
     }
   });
 }
