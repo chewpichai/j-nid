@@ -1,0 +1,105 @@
+{% extends 'ipad/base.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+<div class="order-form-controls row">
+  <div class="col-sm-6">
+    <div>{{ order.person }}</div>
+  </div>
+  
+  <div class="col-sm-6">
+    <div class="created">{{ order.created|date:'d M y H:i' }}</div>
+  </div>
+</div>
+
+<table class="order-form table table-bordered">
+  <thead>
+    <tr>
+      <th class="quantity">จำนวน</th>
+      <th class="name">รายการ</th>
+      <th class="unit">หน่วย</th>
+      <th class="price">ราคา</th>
+      <th class="total">รวม</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr><td colspan="5" style="padding:0;"></td></tr>
+  {% for item in order.order_items.all %}
+    <tr order-item-id="{{ item.pk }}" cost-per-unit="{{ item.cost_per_unit }}" product-id="{{ item.product.pk }}" product-type-id="{{ item.product.type.pk }}" {% if item.is_deleted %}class="deleted"{% endif %}>
+      <td><a href="#qty">{{ item.quantity }}</a></td>
+      <td class="name">{{ item.product.name }}</td>
+      <td><a default="{{ item.product.unit }}" href="#unit">{{ item.unit|floatformat }}</a></td>
+      <td><a default="{{ item.product.price_per_unit }}" href="#price">{{ item.price_per_unit|floatformat }}</a></td>
+      <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  
+  <tfoot>
+    <tr><td colspan="5" style="padding:10px 0 0;"><button id="add-product-btn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button></td></tr>
+
+    <tr>
+      <td colspan="3">
+        <label>หมายเหตุ</label>
+        <textarea id="id-note" class="form-control">{{ order.notation }}</textarea>
+      </td>
+      <td>รวม<br/><br/>ชิ้น</td>
+      <td class="summary"></td>
+    </tr>
+  </tfoot>
+</table>
+
+<div class="submit-wrapper">
+  <button id="order-delete-btn" class="btn btn-danger" order-id="{{ order.pk }}">ลบ</button>
+  <button id="order-submit-btn" type="submit" class="btn btn-primary">บันทึก</button>
+</div>
+
+<div class="hide">
+  <div class="product-dialog">
+    <div class="product-type-list-wrapper">
+      <ul class="product-type-list">
+      {% for product_type in product_types %}
+        <li><a href="#" product-type-id="{{ product_type.pk }}" style="background:{{ product_type.color_hex }};">{{ product_type }}</a></li>
+      {% endfor %}
+        <li><a href="#" product-type-id="basket">ตระกร้า</a></li>
+      </ul>
+    </div>
+
+    <div class="product-list-wrapper">
+      <ul class="product-list">
+        {% include 'ipad/include/product-list.html' %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="quantity-dialog">
+    <label>จำนวน</label>
+    <input type="number" name="quantity" class="form-control">
+  </div>
+
+  <div class="unit-dialog">
+    <label>หน่วย</label>
+    <input type="number" name="unit" class="form-control">
+  </div>
+
+  <div class="price-dialog">
+    <label>ราคา</label>
+    <input type="number" name="price" class="form-control">
+  </div>
+
+  <div class="payment-dialog">
+    <p class="outstanding-wrapper">ยอดค้างชำระ: <span class="outstanding"></span></p>
+    <p>รวม: <span class="summary"></span></p>
+    <p>ชิ้น: <span class="quantity"></span></p>
+    <label>รับชำระจำนวน</label>
+    <input type="number" name="payment" class="form-control">
+  </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+  <script src="{% static 'ipad/js/order.js' %}"></script>
+  <script src="{% static 'ipad/js/order-edit.js' %}"></script>
+{% endblock script %}

@@ -13,8 +13,10 @@
     <link href="{% static 'ipad/css/bootstrap-dialog.min.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/bootstrap-combobox.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ipad/css/datepicker.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/loading.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/base.css' %}" rel="stylesheet">
+    {% block style %}{% endblock style %}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -38,6 +40,7 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="{% url 'ipad.order_create' %}">ทำรายการขาย</a></li>
+            <li><a href="{% url 'ipad.order_search' %}">รายการขาย</a></li>
           </ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
@@ -78,6 +81,9 @@
     <script src="{% static 'ipad/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'ipad/js/bootstrap-dialog.min.js' %}"></script>
     <script src="{% static 'ipad/js/bootstrap-combobox.js' %}"></script>
+    <script src="{% static 'ipad/js/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'ipad/js/bootstrap-datepicker.th.js' %}"></script>
     <script src="{% static 'ipad/js/base.js' %}"></script>
+    {% block script %}{% endblock script %}
   </body>
 </html>
