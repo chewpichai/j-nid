@@ -1,0 +1,32 @@
+{% extends 'ipad/base.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+  <form class="order-search-form" role="form" method="get" action="{% url 'ipad.order_list' %}">
+    <div class="form-group">
+      <label for="id_customer">ลูกค้า:</label>
+      <select id="id-customer" name="customer">
+        <option value=""></option>
+      {% for customer in customers %}
+        <option value="{{ customer.pk }}">{{ customer }}</option>
+      {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="id_start_date">เริ่มจากวันที่:</label>
+      <input id="id_start_date" class="date form-control" name="start_date" type="text">
+    </div>
+    
+    <div class="form-group">
+      <label for="id_end_date">ถึงวันที่:</label>
+      <input id="id_end_date" class="date form-control" name="end_date" type="text">
+    </div>
+    <button type="submit" class="btn btn-default">ค้นหา</button>
+  </form>
+{% endblock content %}
+
+{% block script %}
+  <script src="{% static 'ipad/js/order.js' %}"></script>
+{% endblock script %}

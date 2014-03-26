@@ -1,5 +1,7 @@
 {% extends 'ipad/base.html' %}
 
+{% load staticfiles %}
+
 {% block content %}
 <div class="order-form-controls row">
   <div class="col-sm-6">
@@ -88,3 +90,8 @@
   </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+  <script src="{% static 'ipad/js/order.js' %}"></script>
+  <script src="{% static 'ipad/js/order-create.js' %}"></script>
+{% endblock script %}

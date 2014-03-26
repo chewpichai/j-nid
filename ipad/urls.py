@@ -6,5 +6,8 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('j_nid.ipad.views',
-    url(r'^order/create/$', 'get_order_form', name='ipad.order_create'),
+    url(r'^order/$', 'list_order', name='ipad.order_list'),
+    url(r'^order/(?P<id>\d+)/$', 'edit_order', name='ipad.order_edit'),
+    url(r'^order/create/$', 'create_order', name='ipad.order_create'),
+    url(r'^order/search/$', 'search_order', name='ipad.order_search'),
 )
