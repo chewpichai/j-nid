@@ -48,24 +48,9 @@
 
 <div class="submit-wrapper"><button id="order-submit-btn" type="submit" class="btn btn-default">ชำระเงิน</button></div>
 
+{% include 'ipad/include/order-dialog.html' %}
+
 <div class="hide">
-  <div class="product-dialog">
-    <div class="product-type-list-wrapper">
-      <ul class="product-type-list">
-      {% for product_type in product_types %}
-        <li><a href="#" product-type-id="{{ product_type.pk }}" style="background:{{ product_type.color_hex }};">{{ product_type }}</a></li>
-      {% endfor %}
-        <li><a href="#" product-type-id="basket">ตระกร้า</a></li>
-      </ul>
-    </div>
-
-    <div class="product-list-wrapper">
-      <ul class="product-list">
-        {% include 'ipad/include/product-list.html' %}
-      </ul>
-    </div>
-  </div>
-
   <div class="quantity-dialog">
     <label>จำนวน</label>
     <input type="number" name="quantity" class="form-control">

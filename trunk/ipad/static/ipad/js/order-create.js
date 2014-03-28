@@ -1,6 +1,6 @@
 $(function() {
   var current_hour = (new Date()).getHours();
-  $('.order-form-controls select[name=customer]').val(++current_hour).change(customerChange).change();
+  $('.order-form-controls select[name=customer]').val(++current_hour).change(customerChange).change().combobox();
 
   $('#order-submit-btn').click(orderSubmitClick);
 

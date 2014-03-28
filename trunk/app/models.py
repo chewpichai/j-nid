@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.utils import simplejson as json
 from django.utils.translation import ugettext as _
 import datetime
 import decimal
@@ -217,6 +218,32 @@ class Order(models.Model):
 
     def get_quantity(self):
         return self.order_items.aggregate(models.Sum('quantity'))['quantity__sum'] or 0
+
+    def get_none_deposit_baskets_json(self):
+        baskets = {}
+
+        for item in self.order_baskets.filter(is_deposit=False):
+            basket = baskets.setdefault(item.basket.name, {'unit': 0})
+            basket['unit'] += 1
+            basket['price_per_unit'] = item.price_per_unit
+            basket['product_id'] = item.basket.pk
+            basket['is_basket'] = True
+            baskets[item.basket.name] = basket
+
+        return json.dumps(baskets)
+
+    def get_deposit_baskets(self):
+        baskets = {}
+
+        for item in self.order_baskets.filter(is_deposit=True):
+            basket = baskets.setdefault(item.basket, {'name': item.basket.name, 'unit': 0, 'total': 0})
+            basket['unit'] += 1
+            basket['price_per_unit'] = item.price_per_unit
+            basket['basket'] = item.basket
+            basket['total'] += item.price_per_unit
+            baskets[item.basket] = basket
+
+        return baskets.values()
 
 
 class OrderItem(models.Model):

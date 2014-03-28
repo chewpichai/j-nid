@@ -32,9 +32,11 @@ def login(request):
             return HttpResponse()
     return HttpResponseForbidden()
 
+
 def get_producttypes(request):
     producttypes = ProductType.objects.filter(products__is_sale=True).distinct()
     return response_json(producttypes)
+
 
 def get_products(request):
     products = Product.objects.filter(is_sale=True)
@@ -59,12 +61,14 @@ def get_customers(requset):
     customers = Person.objects.filter(is_customer=True).order_by('name')
     return response_json(customers)
 
+
 def get_baskets(request):
     baskets = Basket.objects.filter(is_sale=True)
     return response_json(baskets)
 
+
 def create_order(request):
-    obj =  json.loads(request.body)
+    obj = json.loads(request.body)
     order = Order.objects.create(notation=obj['notation'],
                 person_id=obj['person'], created=datetime.datetime.now())
     for item in obj['order_items']:
@@ -89,4 +93,62 @@ def create_order(request):
                 break
             paid -= o.total - o.paid
             o.save()
+    return HttpResponse(order.pk)
+
+
+def edit_order(request, id):
+    obj = json.loads(request.body)
+    order = get_object_or_404(Order, pk=id)
+    before_total = order.total
+    import base64
+    order.notation = base64.b64decode(obj['notation'])
+    
+    order.order_baskets.all().delete()
+
+    for item in obj['order_items']:
+        if item.get('id') and not item['is_basket']:
+            order_item = order.order_items.get(id=item['id'])
+            order_item.price_per_unit = item['price_per_unit']
+            order_item.unit = item['unit']
+            order_item.is_deleted = item['is_deleted']
+            order_item.save()
+            continue
+
+        if item['is_basket']:
+            for i in xrange(int(item['unit'])):
+                order.order_baskets.create(basket_id=item['product'],
+                                           price_per_unit=item['price_per_unit'],
+                                           is_deposit=item['is_deposit'])
+        else:
+            order.order_items.create(product_id=item['product'],
+                                     price_per_unit=item['price_per_unit'],
+                                     unit=item['unit'],
+                                     cost_per_unit=item['cost_per_unit'])
+    
+    order.save()
+
+    after_total = order.total
+    diff_total = before_total - after_total
+
+    if diff_total < 0:
+        diff_total = abs(diff_total)
+        
+        for o in order.person.orders.filter(paid__gt=0):
+            if diff_total <= 0:
+                break
+            
+            if int(o.id) != int(order.id):
+                diff_total -= o.paid
+            
+            o.save()
+    elif diff_total > 0:
+        for o in order.person.orders.extra(where=['paid <> total']).order_by('created'):
+            if diff_total <= 0:
+                break
+            
+            if int(o.id) != int(order.id):
+                diff_total -= o.total - o.paid
+            
+            o.save()
+
     return HttpResponse(order.pk)
