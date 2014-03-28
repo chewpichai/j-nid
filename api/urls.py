@@ -9,4 +9,5 @@ urlpatterns = patterns('j_nid.api.views',
     url(r'^customers/$', 'get_customers', name='api-get-customer-list'),
     url(r'^baskets/$', 'get_baskets', name='api-get-basket-list'),
     url(r'^orders/create/$', 'create_order', name='api-create-order'),
+    url(r'^orders/(?P<id>\d+)/edit/$', 'edit_order', name='api-edit-order'),
 )

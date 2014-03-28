@@ -35,6 +35,15 @@
       <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
     </tr>
   {% endfor %}
+  {% for item in order.get_deposit_baskets %}
+    <tr product-id="{{ item.basket.pk }}" product-type-id="basket">
+      <td>0</td>
+      <td class="name">{{ item.basket.name }}</td>
+      <td><a default="{{ item.basket.unit }}" href="#unit">{{ item.unit|floatformat }}</a></td>
+      <td><a default="{{ item.basket.price_per_unit }}" href="#price">{{ item.price_per_unit|floatformat }}</a></td>
+      <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
+    </tr>
+  {% endfor %}
   </tbody>
   
   <tfoot>
@@ -43,7 +52,7 @@
     <tr>
       <td colspan="3">
         <label>หมายเหตุ</label>
-        <textarea id="id-note" class="form-control">{{ order.notation }}</textarea>
+        <textarea id="id-note" class="form-control" data-baskets="{{ order.get_none_deposit_baskets_json }}">{{ order.notation }}</textarea>
       </td>
       <td>รวม<br/><br/>ชิ้น</td>
       <td class="summary"></td>
@@ -52,28 +61,13 @@
 </table>
 
 <div class="submit-wrapper">
-  <button id="order-delete-btn" class="btn btn-danger" order-id="{{ order.pk }}">ลบ</button>
-  <button id="order-submit-btn" type="submit" class="btn btn-primary">บันทึก</button>
+  <button id="order-delete-btn" class="btn btn-danger" data-url="{% url 'ipad.order_delete' id=order.pk %}">ลบ</button>
+  <button id="order-submit-btn" type="submit" class="btn btn-primary" url="{% url 'api-edit-order' id=order.pk %}">บันทึก</button>
 </div>
 
+{% include 'ipad/include/order-dialog.html' %}
+
 <div class="hide">
-  <div class="product-dialog">
-    <div class="product-type-list-wrapper">
-      <ul class="product-type-list">
-      {% for product_type in product_types %}
-        <li><a href="#" product-type-id="{{ product_type.pk }}" style="background:{{ product_type.color_hex }};">{{ product_type }}</a></li>
-      {% endfor %}
-        <li><a href="#" product-type-id="basket">ตระกร้า</a></li>
-      </ul>
-    </div>
-
-    <div class="product-list-wrapper">
-      <ul class="product-list">
-        {% include 'ipad/include/product-list.html' %}
-      </ul>
-    </div>
-  </div>
-
   <div class="quantity-dialog">
     <label>จำนวน</label>
     <input type="number" name="quantity" class="form-control">

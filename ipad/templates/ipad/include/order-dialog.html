@@ -1,0 +1,26 @@
+<div id="product-dialog" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">เพิ่มรายการสินค้า</h4>
+      </div>
+      <div class="modal-body">
+        <div class="product-type-list-wrapper">
+          <ul class="product-type-list">
+          {% for product_type in product_types %}
+            <li><a href="#" product-type-id="{{ product_type.pk }}" style="background:{{ product_type.color_hex }};">{{ product_type }}</a></li>
+          {% endfor %}
+            <li><a href="#" product-type-id="basket">ตระกร้า</a></li>
+          </ul>
+        </div>
+
+        <div class="product-list-wrapper">
+          <ul class="product-list">
+            {% include 'ipad/include/product-list.html' %}
+          </ul>
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

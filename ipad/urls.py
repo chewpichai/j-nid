@@ -8,6 +8,7 @@ urlpatterns = patterns('',
 urlpatterns += patterns('j_nid.ipad.views',
     url(r'^order/$', 'list_order', name='ipad.order_list'),
     url(r'^order/(?P<id>\d+)/$', 'edit_order', name='ipad.order_edit'),
+    url(r'^order/(?P<id>\d+)/delete/$', 'delete_order', name='ipad.order_delete'),
     url(r'^order/create/$', 'create_order', name='ipad.order_create'),
     url(r'^order/search/$', 'search_order', name='ipad.order_search'),
 )

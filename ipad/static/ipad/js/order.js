@@ -1,5 +1,5 @@
 $(function() {
-  $('select[name=customer]').combobox();
+  $('.order-search-form select[name=customer]').combobox();
 
   $('.order-form').on('click', 'a.remove-product-btn', removeBtnClick);
 
@@ -20,18 +20,14 @@ $(function() {
 
 
 function addProductBtnClick() {
-  dialog_instance = BootstrapDialog.show({
-    title: 'เพิ่มรายการสินค้า',
-    message: $('.product-dialog').clone(),
-    onshow: function() {
-      setTimeout(initProductTypeList, 300);
-    }
+  $('#product-dialog').modal().on('shown.bs.modal', function(e) {
+    initProductTypeList();
   });
 }
 
 
 function initProductTypeList() {
-  var width = 0;
+  var width = 2;
 
   $('.product-type-list li').each(function(i, elm) {
     width += $(elm).outerWidth(true);
@@ -52,7 +48,7 @@ function productTypeClick() {
 
 
 function productClick() {
-  dialog_instance.close();
+  $('#product-dialog').modal('hide');
 
   var product_type_id = $(this).closest('[product-type-id]').attr('product-type-id');
 
@@ -67,8 +63,8 @@ function productClick() {
 }
 
 
-function addProduct(elm, is_pledge) {
-  var is_pledge = typeof is_pledge !== 'undefined' ? is_pledge : false;
+function addProduct(elm, is_deposit) {
+  var is_deposit = typeof is_deposit !== 'undefined' ? is_deposit : false;
       product_id = $(elm).attr('product-id'),
       product_type_id = $(elm).closest('[product-type-id]').attr('product-type-id'),
       name = $(elm).text(),
@@ -79,7 +75,7 @@ function addProduct(elm, is_pledge) {
       $existed_tr = $('.order-form tbody tr[product-id=' + product_id + '][product-type-id=' + product_type_id + ']'),
       output = [];
 
-  if (product_type_id == 'basket' && !is_pledge) {
+  if (product_type_id == 'basket' && !is_deposit) {
     var note_txt = $('#id-note').val(),
         re = new RegExp(RegExp.quote(name) + ' x \\d+', 'm'),
         existed = re.exec(note_txt),
@@ -165,7 +161,10 @@ function removeBtnClick() {
 function orderItemSwipe(event, direction, distance, duration, fingerCount) {
   var $tr = $(event.currentTarget);
 
-  if ($tr.hasClass('deleted')) return;
+  if ($tr.hasClass('deleted')) {
+    $tr.removeClass('deleted');
+    return;
+  }
 
   if (direction == 'left') {
     $tr.find('.remove-product-btn-wrapper').show();

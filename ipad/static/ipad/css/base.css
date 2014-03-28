@@ -64,6 +64,11 @@ body {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  overflow: hidden;
+}
+
+.product-type-list {
+  width: 9999px;
 }
 
 .product-type-list li,
