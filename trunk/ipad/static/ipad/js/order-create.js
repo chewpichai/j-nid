@@ -1,6 +1,10 @@
 $(function() {
   var current_hour = (new Date()).getHours();
-  $('.order-form-controls select[name=customer]').val(++current_hour).change(customerChange).change().combobox();
+  $('.order-form-controls select[name=customer]').val(++current_hour).change(customerChange).change().chosen({
+    width: '300px',
+    allow_single_deselect: true,
+    no_results_text: "ไม่พบลูกค้าชื่อ"
+  });
 
   $('#order-submit-btn').click(orderSubmitClick);
 

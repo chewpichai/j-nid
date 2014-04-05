@@ -1,0 +1,67 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>เจ๊นิดผลไม้ | JNid Shop</title>
+
+    <link href="{% static 'ipad/css/reset.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ipad/css/print.css' %}" rel="stylesheet">
+  </head>
+  <body>
+    <div class="main-wrapper container">
+      <div class="order-form-controls">
+        <div class="customer">{{ order.person }}</div>
+        <div class="created">{{ order.created|date:'d M y H:i' }}</div>
+      </div>
+
+      <table class="order-form table table-bordered">
+        <thead>
+          <tr>
+            <th class="quantity">จำนวน</th>
+            <th class="name">รายการ</th>
+            <th class="unit">หน่วย</th>
+            <th class="price">ราคา</th>
+            <th class="total">รวม</th>
+          </tr>
+        </thead>
+
+        <tfoot>
+          <tr>
+            <td colspan="3">
+              <label>หมายเหตุ</label>
+              <pre>{{ order.notation }}</pre>
+            </td>
+            <td>รวม {{ order.total|floatformat }}<br/><br/>ชิ้น {{ order.quantity }}</td>
+            <td class="summary"></td>
+          </tr>
+        </tfoot>
+        
+        <tbody>
+          <tr><td colspan="5" style="padding:0;"></td></tr>
+        {% for item in order.order_items.all %}
+          <tr order-item-id="{{ item.pk }}" cost-per-unit="{{ item.cost_per_unit }}" product-id="{{ item.product.pk }}" product-type-id="{{ item.product.type.pk }}" {% if item.is_deleted %}class="deleted"{% endif %}>
+            <td>{{ item.quantity }}</td>
+            <td class="name">{{ item.product.name }}</td>
+            <td>{{ item.unit|floatformat }}</td>
+            <td>{{ item.price_per_unit|floatformat }}</td>
+            <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
+          </tr>
+        {% endfor %}
+        {% for item in order.get_deposit_baskets %}
+          <tr product-id="{{ item.basket.pk }}" product-type-id="basket">
+            <td>0</td>
+            <td class="name">{{ item.basket.name }}</td>
+            <td><a default="{{ item.basket.unit }}" href="#unit">{{ item.unit|floatformat }}</a></td>
+            <td><a default="{{ item.basket.price_per_unit }}" href="#price">{{ item.price_per_unit|floatformat }}</a></td>
+            <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

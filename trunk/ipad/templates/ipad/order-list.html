@@ -1,27 +1,59 @@
 {% extends 'ipad/base.html' %}
 
-{% block content %}
-  <table class="order-list table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>วันที่</th>
-        <th>ลูกค้า</th>
-        <th>ราคารวม</th>
-        <th>จำนวนชิ้น</th>
-        <th>&nbsp;</th>
-      </tr>
-    </thead>
+{% load staticfiles %}
 
-    <tbody>
-    {% for order in orders %}
-      <tr>
-        <td>{{ order.created|date:'d M y H:i' }}</td>
-        <td>{{ order.person }}</td>
-        <td>{{ order.total|floatformat }}</td>
-        <td>{{ order.quantity }}</td>
-        <td class="edit"><a href="{% url 'ipad.order_edit' id=order.id %}"><span class="glyphicon glyphicon-edit"></span></a></td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+{% block content %}
+<div class="row">
+  <div class="col-sm-3">
+    <div class="order-search-form-wrapper">
+      <form class="order-search-form" role="form" method="get">
+        <div class="form-group">
+          <label for="id_customer">ลูกค้า:</label>
+          {{ form.customer }}
+        </div>
+
+        <div class="form-group">
+          <label for="id_start_date">เริ่มจากวันที่:</label>
+          {{ form.start_date }}
+        </div>
+        
+        <div class="form-group">
+          <label for="id_end_date">ถึงวันที่:</label>
+          {{ form.end_date }}
+        </div>
+        <button type="submit" class="btn btn-default">ค้นหา</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-sm-9">
+    <table class="order-list table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th class="created">วันที่</th>
+          <th>ลูกค้า</th>
+          <th>รวม</th>
+          <th>จำนวน</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for order in orders %}
+        <tr>
+          <td>{{ order.created|date:'d M y H:i' }}</td>
+          <td>{{ order.person }}</td>
+          <td>{{ order.total|floatformat }}</td>
+          <td>{{ order.quantity }}</td>
+          <td class="edit"><a href="{% url 'ipad.order_edit' id=order.id %}"><span class="glyphicon glyphicon-edit"></span></a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock content %}
+
+{% block script %}
+  <script src="{% static 'ipad/js/order.js' %}"></script>
+{% endblock script %}

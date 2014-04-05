@@ -8,6 +8,7 @@ from j_nid.app.models import *
 from j_nid.app.views import response_xml
 import decimal
 import datetime
+import os
 
 
 def response_json(data):
@@ -152,3 +153,12 @@ def edit_order(request, id):
             o.save()
 
     return HttpResponse(order.pk)
+
+
+def do_print(request):
+    url = request.GET.get('url')
+    cmd_path = os.path.join(os.path.dirname(__file__), 'cmd', 'print.js')
+    out_path = os.path.join(os.path.dirname(__file__), 'cmd', 'print.pdf')
+    os.system('phantomjs "%s" "%s" "%s"' % (cmd_path, url, out_path))
+    
+    return HttpResponse()

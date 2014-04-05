@@ -42,11 +42,16 @@
   font-style: normal;
 }
 
+html {
+  height: 100%;
+}
+
 body {
 	padding-top: 70px;
   font-size: 16px;
   line-height: 1.2em;
   font-family: 'Sukhumvit Thin';
+  min-height: 100%;
 }
 
 .product-type-list-wrapper,
@@ -241,7 +246,8 @@ input[name=unit] {
 
 .quantity-dialog,
 .unit-dialog,
-.price-dialog {
+.price-dialog,
+.quantity-price-dialog {
   text-align: center;
 }
 
@@ -265,6 +271,7 @@ input[name=unit] {
 
 .main-wrapper {
   margin-bottom: 56px;
+  min-height: 500px;
 }
 
 table.order-list thead > tr > th {
@@ -274,6 +281,10 @@ table.order-list thead > tr > th {
 table.order-list tbody > tr > td {
   vertical-align: middle;
   padding: 15px;
+}
+
+table.order-list .created {
+  width: 115px;
 }
 
 table.order-list .edit {
@@ -310,20 +321,41 @@ table.order-list .edit {
   content:"\e079";
 }
 
+.chosen-container {
+  display: block;
+}
+
+.chosen-container-single .chosen-single {
+  height: 32px;
+  line-height: 32px;
+}
+
+.chosen-container-single .chosen-single div b {
+  background-position: 0 6px;
+}
+
+.chosen-container-active.chosen-with-drop .chosen-single div b {
+  background-position: -18px 6px;
+}
+
+.chosen-container-single .chosen-single abbr {
+  top: 10px;
+}
+
 
 @media (min-width: 768px) {
   .modal-dialog {
     width: 680px;
   }
 
-  .login-form,
-  .order-search-form {
+  .login-form {
     width: 300px;
     margin: 0 auto;
     padding-top: 8px;
   }
 
-  .order-search-form .combobox-container input {
-    width: 274px;
+  .order-search-form-wrapper {
+    max-width: 158px;
+    position: fixed;
   }
 }

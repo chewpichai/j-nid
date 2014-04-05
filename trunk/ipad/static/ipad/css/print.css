@@ -1,0 +1,34 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'lucida grande',tahoma,verdana,arial,sans-serif;
+  font-size: 16px;
+  line-height: 1.25em;
+  width: 96%;
+  height: 96%;
+  padding: 2%;
+}
+
+.order-form-controls {
+  overflow: hidden;
+}
+
+.customer {
+  float: left;
+}
+
+.created {
+  float: right;
+}
+
+.order-form {
+  width: 100%;
+}
+
+.order-form th,
+.order-form td {
+  padding: 5px;
+}
