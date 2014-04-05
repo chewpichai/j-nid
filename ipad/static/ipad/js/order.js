@@ -1,5 +1,9 @@
 $(function() {
-  $('.order-search-form select[name=customer]').combobox();
+  $('.order-search-form select[name=customer]').chosen({
+    width: '100%',
+    allow_single_deselect: true,
+    no_results_text: 'ไม่พบลูกค้าชื่อ'
+  });
 
   $('.order-form').on('click', 'a.remove-product-btn', removeBtnClick);
 
@@ -57,18 +61,28 @@ function productClick() {
     return false;
   }
   
-  addProduct(this);
+  showProductComfirmDialog(this, false);
 
   return false;
 }
 
+function showProductComfirmDialog(elm, is_deposit) {
+  var $dialog = $('.quantity-price-dialog').clone(),
+      $elm = $(elm).clone();
+
+  $dialog.find('[name=quantity]').val('1');
+  $dialog.find('[name=price]').val(parseFloat($elm.attr('price-per-unit')));
+  BootstrapDialog.product_confirm($elm, $dialog, is_deposit);
+}
+
 
 function addProduct(elm, is_deposit) {
-  var is_deposit = typeof is_deposit !== 'undefined' ? is_deposit : false;
-      product_id = $(elm).attr('product-id'),
+  var product_id = $(elm).attr('product-id'),
       product_type_id = $(elm).closest('[product-type-id]').attr('product-type-id'),
       name = $(elm).text(),
-      unit = parseFloat($(elm).attr('unit')),
+      quantity = parseFloat($(elm).attr('quantity')),
+      quantity = isNaN(quantity) ? 1 : quantity,
+      unit = parseFloat($(elm).attr('unit')) * quantity,
       price_per_unit = parseFloat($(elm).attr('price-per-unit')),
       cost_per_unit = parseFloat($(elm).attr('cost-per-unit')),
       total = unit * price_per_unit,
@@ -119,7 +133,7 @@ function addProduct(elm, is_deposit) {
     output.push('<tr product-type-id="' + product_type_id + '" product-id="' + product_id + '" cost-per-unit="' + cost_per_unit + '">');
     
     if (product_type_id == 'basket') output.push('<td>0</td>');
-    else output.push('<td><a href="#qty">1</a></td>');
+    else output.push('<td><a href="#qty">' + quantity + '</a></td>');
 
     output.push('<td class="name">' + name + '</td>');
     output.push('<td><a href="#unit" default="' + unit + '">' + unit + '</a></td>');
@@ -306,14 +320,39 @@ function updateSummary() {
 }
 
 
+BootstrapDialog.product_confirm = function($elm, $dialog, is_deposit) {
+  new BootstrapDialog({
+    title: $elm.text(),
+    message: $dialog,
+    closable: false,
+    data: {elm: $elm, is_deposit: is_deposit},
+    buttons: [{
+      label: 'ตกลง',
+      action: function(dialog) {
+        var price = $(dialog.getMessage()).find('input[name=price]').val(),
+            quantity = $(dialog.getMessage()).find('input[name=quantity]').val(),
+            $elm = dialog.getData('elm'),
+            is_deposit = dialog.getData('is_deposit');
+
+        $elm.attr('price-per-unit', price);
+        $elm.attr('quantity', quantity);
+        addProduct($elm[0], is_deposit);
+        dialog.close();
+      }
+    }],
+    onshow: function(dialog) {
+      dialog.getModalDialog().find('.form-field').swipe({swipe: numberSwipe, threshold: 0});
+    }
+  }).open();
+};
+
+
 BootstrapDialog.basket_confirm = function(elm) {
   new BootstrapDialog({
     title: 'ชนิดของตระกร้า',
     message: '',
     closable: false,
-    data: {
-      'elm': elm
-    },
+    data: {elm: elm},
     buttons: [{
       label: 'มัดจำ',
       action: function(dialog) {

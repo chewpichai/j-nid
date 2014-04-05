@@ -23,6 +23,19 @@
       <th class="total">รวม</th>
     </tr>
   </thead>
+
+  <tfoot>
+    <tr><td colspan="5" style="padding:10px 0 0;"><button id="add-product-btn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button></td></tr>
+
+    <tr>
+      <td colspan="3">
+        <label>หมายเหตุ</label>
+        <textarea id="id-note" class="form-control" data-baskets="{{ order.get_none_deposit_baskets_json }}">{{ order.notation }}</textarea>
+      </td>
+      <td>รวม<br/><br/>ชิ้น</td>
+      <td class="summary"></td>
+    </tr>
+  </tfoot>
   
   <tbody>
     <tr><td colspan="5" style="padding:0;"></td></tr>
@@ -45,19 +58,6 @@
     </tr>
   {% endfor %}
   </tbody>
-  
-  <tfoot>
-    <tr><td colspan="5" style="padding:10px 0 0;"><button id="add-product-btn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button></td></tr>
-
-    <tr>
-      <td colspan="3">
-        <label>หมายเหตุ</label>
-        <textarea id="id-note" class="form-control" data-baskets="{{ order.get_none_deposit_baskets_json }}">{{ order.notation }}</textarea>
-      </td>
-      <td>รวม<br/><br/>ชิ้น</td>
-      <td class="summary"></td>
-    </tr>
-  </tfoot>
 </table>
 
 <div class="submit-wrapper">
@@ -66,31 +66,6 @@
 </div>
 
 {% include 'ipad/include/order-dialog.html' %}
-
-<div class="hide">
-  <div class="quantity-dialog">
-    <label>จำนวน</label>
-    <input type="number" name="quantity" class="form-control">
-  </div>
-
-  <div class="unit-dialog">
-    <label>หน่วย</label>
-    <input type="number" name="unit" class="form-control">
-  </div>
-
-  <div class="price-dialog">
-    <label>ราคา</label>
-    <input type="number" name="price" class="form-control">
-  </div>
-
-  <div class="payment-dialog">
-    <p class="outstanding-wrapper">ยอดค้างชำระ: <span class="outstanding"></span></p>
-    <p>รวม: <span class="summary"></span></p>
-    <p>ชิ้น: <span class="quantity"></span></p>
-    <label>รับชำระจำนวน</label>
-    <input type="number" name="payment" class="form-control">
-  </div>
-</div>
 {% endblock content %}
 
 {% block script %}

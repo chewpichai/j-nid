@@ -9,9 +9,9 @@
     <title>เจ๊นิดผลไม้ | JNid Shop</title>
 
     <!-- Bootstrap -->
+    <link href="{% static 'ipad/css/chosen.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/bootstrap-dialog.min.css' %}" rel="stylesheet">
-    <link href="{% static 'ipad/css/bootstrap-combobox.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/animate.min.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/datepicker.css' %}" rel="stylesheet">
     <link href="{% static 'ipad/css/loading.css' %}" rel="stylesheet">
@@ -39,8 +39,8 @@
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="{% url 'ipad.order_create' %}">ทำรายการขาย</a></li>
-            <li><a href="{% url 'ipad.order_search' %}">รายการขาย</a></li>
+            <li {% if page == 'order_create' %}class="active"{% endif %}><a href="{% url 'ipad.order_create' %}">ทำรายการขาย</a></li>
+            <li {% if page == 'order_list' %}class="active"{% endif %}><a href="{% url 'ipad.order_list' %}">รายการขาย</a></li>
           </ul>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
@@ -78,9 +78,9 @@
     <script src="{% static 'ipad/js/jquery.min.js' %}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static 'ipad/js/jquery.touchSwipe.min.js' %}"></script>
+    <script src="{% static 'ipad/js/chosen.jquery.min.js' %}"></script>
     <script src="{% static 'ipad/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'ipad/js/bootstrap-dialog.min.js' %}"></script>
-    <script src="{% static 'ipad/js/bootstrap-combobox.js' %}"></script>
     <script src="{% static 'ipad/js/bootstrap-datepicker.js' %}"></script>
     <script src="{% static 'ipad/js/bootstrap-datepicker.th.js' %}"></script>
     <script src="{% static 'ipad/js/base64.js' %}"></script>

@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import simplejson as json
 from j_nid.app.models import *
 from j_nid.ipad.forms import *
+import datetime
 
 
 @login_required(login_url='/ipad/')
@@ -14,22 +15,19 @@ def create_order(request):
     products = Product.objects.filter(is_sale=True)
     baskets = Basket.objects.filter(is_sale=True)
     customers = Person.objects.filter(is_customer=True)
+    page = 'order_create'
     return render(request, 'ipad/order-create.html', locals())
 
 
 @login_required(login_url='/ipad/')
-def search_order(request):
-    customers = Person.objects.filter(is_customer=True)
-    return render(request, 'ipad/order-search.html', locals())
-
-
-@login_required(login_url='/ipad/')
 def list_order(request):
-    form = OrderSearchForm(request.GET)
+    data = request.GET or {'start_date': datetime.date.today().strftime('%d/%m/%Y')}
+    form = OrderSearchForm(data)
 
     if form.is_valid():
         orders = form.get_orders()
-
+    
+    page = 'order_list'
     return render(request, 'ipad/order-list.html', locals())
 
 
@@ -42,6 +40,7 @@ def edit_order(request, id):
     products = Product.objects.filter(is_sale=True)
     baskets = Basket.objects.filter(is_sale=True)
     return render(request, 'ipad/order-edit.html', locals())
+
 
 @login_required(login_url='/ipad/')
 def delete_order(request, id):
@@ -60,3 +59,8 @@ def delete_order(request, id):
     data = {'url': request.session['order_list_url'] or reverse('ipad.order_search'),
             'status': 'success'}
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def print_order(request, id):
+    order = get_object_or_404(Order, id=id)
+    return render(request, 'ipad/order-print.html', locals())
