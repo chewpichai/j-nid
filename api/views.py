@@ -9,6 +9,8 @@ from j_nid.app.views import response_xml
 import decimal
 import datetime
 import os
+import tempfile
+import subprocess
 
 
 def response_json(data):
@@ -158,7 +160,7 @@ def edit_order(request, id):
 def do_print(request):
     url = request.GET.get('url')
     cmd_path = os.path.join(os.path.dirname(__file__), 'cmd', 'print.js')
-    out_path = os.path.join(os.path.dirname(__file__), 'cmd', 'print.pdf')
+    out_path = os.path.join(tempfile.gettempdir(), 'cmd', 'print.pdf')
     os.system('phantomjs "%s" "%s" "%s"' % (cmd_path, url, out_path))
-    
+    subprocess.Popen('"C:\Program Files (x86)\Adobe\Reader 11.0\Reader\AcroRd32.exe" /T "%s"' % out_path, shell=True)
     return HttpResponse()

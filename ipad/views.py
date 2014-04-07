@@ -63,4 +63,20 @@ def delete_order(request, id):
 
 def print_order(request, id):
     order = get_object_or_404(Order, id=id)
+    items = list(order.order_items.all()) + list(order.get_deposit_baskets())
+    item_pages = []
+    nums = len(items) / 14
+
+    for i in range(nums + 1):
+        page = items[i * 14:(i + 1) * 14]
+
+        if page:
+            remains = len(page) % 14
+
+            if remains > 0:
+                for i in range(remains, 14):
+                    page.append({'name':'&nbsp;'})
+            
+            item_pages.append(page)
+    
     return render(request, 'ipad/order-print.html', locals())

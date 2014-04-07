@@ -56,8 +56,9 @@ function orderSubmitClick() {
     }
   });
 
+  $('#order-submit-btn, #order-delete-btn').hide().nextAll('img').removeClass('hide');
+
   $.post(url, JSON.stringify(data), function(response) {
-    $('#loading').modal();
     location.reload();
   });
 }
@@ -76,6 +77,8 @@ BootstrapDialog.order_delete_confirm = function(elm) {
       label: 'ใช่',
       cssClass: 'btn-danger',
       action: function(dialog) {
+        dialog.close();
+        $('#order-submit-btn, #order-delete-btn').hide().nextAll('img').removeClass('hide');
         $.post($(elm).data('url'), function(response) {
           if (response.status == 'success')
             location = response.url;

@@ -70,9 +70,9 @@ function orderSubmitClick() {
       action: function(dialog) {
         data.paid = parseFloat($(dialog.getMessage()).find('input[name=payment]').val());
         data.paid = isNaN(data.paid)? 0:data.paid;
+        dialog.close();
+        $('#order-submit-btn').hide().next().removeClass('hide');
         $.post('/api/orders/create/', JSON.stringify(data), function(response) {
-          dialog.close();
-          $('#loading').modal();
           location.reload();
         });
       }
