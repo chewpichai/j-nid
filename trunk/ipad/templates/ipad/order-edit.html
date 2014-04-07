@@ -63,6 +63,7 @@
 <div class="submit-wrapper">
   <button id="order-delete-btn" class="btn btn-danger" data-url="{% url 'ipad.order_delete' id=order.pk %}">ลบ</button>
   <button id="order-submit-btn" type="submit" class="btn btn-primary" url="{% url 'api-edit-order' id=order.pk %}">บันทึก</button>
+  <img class="hide" src="{% static 'ipad/images/loading.gif' %}" alt="loading">
 </div>
 
 {% include 'ipad/include/order-dialog.html' %}

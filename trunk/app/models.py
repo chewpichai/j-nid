@@ -236,7 +236,7 @@ class Order(models.Model):
         baskets = {}
 
         for item in self.order_baskets.filter(is_deposit=True):
-            basket = baskets.setdefault(item.basket, {'name': item.basket.name, 'unit': 0, 'total': 0})
+            basket = baskets.setdefault(item.basket, {'name': item.basket.name, 'unit': 0, 'total': 0, 'quantity': 0})
             basket['unit'] += 1
             basket['price_per_unit'] = item.price_per_unit
             basket['basket'] = item.basket
