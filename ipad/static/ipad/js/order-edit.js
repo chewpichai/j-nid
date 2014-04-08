@@ -12,9 +12,19 @@ $(function() {
   $('#id-note').data('baskets', baskets);
 
   $('#order-submit-btn').click(orderSubmitClick);
+  $('#order-print-btn').click(orderPrintClick);
 
   updateSummary();
 });
+
+
+function orderPrintClick() {
+  var url = location.origin + $(this).data('url');
+  $('#order-submit-btn, #order-delete-btn, #order-print-btn').hide().nextAll('img').removeClass('hide');
+  $.get('/api/print/', {url:url}, function(response) {
+    $('#order-submit-btn, #order-delete-btn, #order-print-btn').show().nextAll('img').addClass('hide');
+  });
+}
 
 
 function orderSubmitClick() {
@@ -56,7 +66,7 @@ function orderSubmitClick() {
     }
   });
 
-  $('#order-submit-btn, #order-delete-btn').hide().nextAll('img').removeClass('hide');
+  $('#order-submit-btn, #order-delete-btn, #order-print-btn').hide().nextAll('img').removeClass('hide');
 
   $.post(url, JSON.stringify(data), function(response) {
     location.reload();
@@ -78,7 +88,7 @@ BootstrapDialog.order_delete_confirm = function(elm) {
       cssClass: 'btn-danger',
       action: function(dialog) {
         dialog.close();
-        $('#order-submit-btn, #order-delete-btn').hide().nextAll('img').removeClass('hide');
+        $('#order-submit-btn, #order-delete-btn, #order-print-btn').hide().nextAll('img').removeClass('hide');
         $.post($(elm).data('url'), function(response) {
           if (response.status == 'success')
             location = response.url;
