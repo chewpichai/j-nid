@@ -15,12 +15,13 @@
     <div class="main-wrapper container">
       <div class="order-form-controls">
         <div class="customer">{{ order.person }}</div>
-        <div class="created">{{ order.created|date:'d M y H:i' }}</div>
+        <div class="created">{{ order.created|date:'d/m/y H:i' }}</div>
       </div>
 
     {% for page in item_pages %}
       <table class="order-form table table-bordered" {% if forloop.counter > 1 %}style="page-break-before:always;"{% endif %}>
         <thead>
+          {% if forloop.counter > 1 %}<tr style="height:0.65in;"><td colspan="5">&nbsp;</td></tr>{% endif %}
           <tr>
             <th class="quantity">จำนวน</th>
             <th class="name">รายการ</th>
@@ -51,9 +52,7 @@
     {% endfor %}
     </div>
 
-    <div class="notation">
-      <pre>{{ order.notation }}</pre>
-    </div>
+    <div class="notation">{{ order.notation|linebreaksbr }}</div>
 
     <div class="order-form-footer">
       <div class="total-quantity">จำนวนรวม {{ order.quantity }} ชิ้น</div>

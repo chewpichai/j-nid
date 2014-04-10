@@ -73,7 +73,7 @@ function orderSubmitClick() {
         dialog.close();
         $('#order-submit-btn').hide().next().removeClass('hide');
         $.post('/api/orders/create/', JSON.stringify(data), function(response) {
-          location.reload();
+          location = '/ipad/order/' + response + '/';
         });
       }
     }],

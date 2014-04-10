@@ -21,7 +21,7 @@ $(function() {
 function orderPrintClick() {
   var url = location.origin + $(this).data('url');
   $('#order-submit-btn, #order-delete-btn, #order-print-btn').hide().nextAll('img').removeClass('hide');
-  $.get('/api/print/', {url:url}, function(response) {
+  $.get(location.protocol + '//' + location.hostname + ':8000' + '/api/print/', {url:url}, function(response) {
     $('#order-submit-btn, #order-delete-btn, #order-print-btn').show().nextAll('img').addClass('hide');
   });
 }
