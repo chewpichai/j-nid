@@ -65,16 +65,17 @@ def print_order(request, id):
     order = get_object_or_404(Order, id=id)
     items = list(order.order_items.all()) + list(order.get_deposit_baskets())
     item_pages = []
-    nums = len(items) / 14
+    nums_per_page = 13
+    nums = len(items) / nums_per_page
 
     for i in range(nums + 1):
-        page = items[i * 14:(i + 1) * 14]
+        page = items[i * nums_per_page:(i + 1) * nums_per_page]
 
         if page:
-            remains = len(page) % 14
+            remains = len(page) % nums_per_page
 
             if remains > 0:
-                for i in range(remains, 14):
+                for i in range(remains, nums_per_page):
                     page.append({'name':'&nbsp;'})
             
             item_pages.append(page)

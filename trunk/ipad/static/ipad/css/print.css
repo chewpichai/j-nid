@@ -1,16 +1,27 @@
+@font-face {
+  font-family: 'AngsanaUPC';
+  src: url('../fonts/angsau-webfont.eot');
+  src: url('../fonts/angsau-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/angsau-webfont.woff') format('woff'),
+       url('../fonts/angsau-webfont.ttf') format('truetype'),
+       url('../fonts/angsau-webfont.svg#angsanaupcregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html {
   width: 100%;
   height: 100%;
 }
 
 body {
-  font-family: 'lucida grande',tahoma,verdana,arial,sans-serif;
-  font-size: 16px;
-  line-height: 1.25em;
+  font-family: 'AngsanaUPC',sans-serif;
+  font-size: 26px;
+  line-height: 1em;
   width: 96%;
   height: 96%;
   padding: 2%;
-  padding-top: 2in;
+  padding-top: 1.6in;
 }
 
 .order-form-controls {
@@ -19,7 +30,8 @@ body {
 
 .notation {
   width: 70%;
-  min-height: 6em;
+  min-height: 3em;
+  margin-top: 1em;
 }
 
 .total-quantity {
@@ -48,7 +60,7 @@ body {
 .order-form th,
 .order-form td {
   padding: 5px;
-  height: 1.5em;
+  height: 1em;
 }
 
 .order-form th {
@@ -59,9 +71,12 @@ body {
   width: 4%;
 }
 
-.order-form .unit,
+.order-form .unit {
+  width: 9%;
+}
+
 .order-form .price {
-  width: 6%;
+  width: 8%;
 }
 
 .order-form .total {
