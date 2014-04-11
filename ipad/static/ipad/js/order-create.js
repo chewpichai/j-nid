@@ -15,7 +15,7 @@ $(function() {
 function customerChange() {
   var customer_id = this.value,
       outstanding = $(this).find('option[value=' + customer_id + ']').data('outstanding');
-  
+
   $('.outstanding').html(Math.abs(outstanding));
   $('.outstanding').removeClass('red');
 
@@ -37,7 +37,7 @@ function orderSubmitClick() {
         item = {
           is_basket: $tr.attr('product-type-id') == 'basket',
           price_per_unit: parseFloat($tr.find('a[href=#price]').text()),
-          unit: parseInt($tr.find('a[href=#unit]').text()),
+          unit: parseFloat($tr.find('a[href=#unit]').text()),
           product: $tr.attr('product-id'),
           cost_per_unit: parseFloat($tr.attr('cost-per-unit')),
           is_deposit: true
@@ -83,7 +83,7 @@ function orderSubmitClick() {
       if (data.person <= 24) {
         summary = $(dialog.getMessage()).find('.summary').html();
       }
-      
+
       $(dialog.getMessage()).find('input[name=payment]').val(summary);
     }
   });

@@ -60,7 +60,7 @@ function productClick() {
     BootstrapDialog.basket_confirm(this);
     return false;
   }
-  
+
   showProductComfirmDialog(this, false);
 
   return false;
@@ -82,7 +82,8 @@ function addProduct(elm, is_deposit) {
       name = $(elm).text(),
       quantity = parseFloat($(elm).attr('quantity')),
       quantity = isNaN(quantity) ? 1 : quantity,
-      unit = parseFloat($(elm).attr('unit')) * quantity,
+      default_unit = parseFloat($(elm).attr('unit')),
+      unit = default_unit * quantity,
       price_per_unit = parseFloat($(elm).attr('price-per-unit')),
       cost_per_unit = parseFloat($(elm).attr('cost-per-unit')),
       total = unit * price_per_unit,
@@ -116,13 +117,13 @@ function addProduct(elm, is_deposit) {
 
     return;
   }
-  
+
   if ($existed_tr.length && !$existed_tr.hasClass('deleted')) {
     var qty = parseFloat($existed_tr.find('a[href=#qty]').text()),
         price = parseFloat($existed_tr.find('a[href=#price]').text()),
         unit = parseFloat($existed_tr.find('a[href=#unit]').text()),
         default_unit = parseFloat($existed_tr.find('a[href=#unit]').attr('default'));
-    
+
     if (product_type_id != 'basket') qty++;
 
     unit += default_unit;
@@ -131,12 +132,12 @@ function addProduct(elm, is_deposit) {
     $existed_tr.find('.total').text(unit * price);
   } else {
     output.push('<tr product-type-id="' + product_type_id + '" product-id="' + product_id + '" cost-per-unit="' + cost_per_unit + '">');
-    
+
     if (product_type_id == 'basket') output.push('<td>0</td>');
     else output.push('<td><a href="#qty">' + quantity + '</a></td>');
 
     output.push('<td class="name">' + name + '</td>');
-    output.push('<td><a href="#unit" default="' + unit + '">' + unit + '</a></td>');
+    output.push('<td><a href="#unit" default="' + default_unit + '">' + unit + '</a></td>');
     output.push('<td><a href="#price" default="' + price_per_unit + '">' + price_per_unit + '</a></td>');
     output.push('<td><div class="total-wrapper"><span class="total">' + total + '</span><div class="remove-product-btn-wrapper"><a href="#remove" class="remove-product-btn"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>');
     output.push('</tr>');
@@ -146,7 +147,7 @@ function addProduct(elm, is_deposit) {
       swipe: orderItemSwipe,
     });
   }
-  
+
   updateSummary();
 }
 
@@ -182,7 +183,7 @@ function orderItemSwipe(event, direction, distance, duration, fingerCount) {
 
   if (direction == 'left') {
     $tr.find('.remove-product-btn-wrapper').show();
-    $tr.find('.remove-product-btn').addClass('animated bounceInRight');  
+    $tr.find('.remove-product-btn').addClass('animated bounceInRight');
   } else if (direction == 'right') {
     if ($tr.find('.remove-product-btn').hasClass('bounceInRight')) {
       $tr.find('.remove-product-btn').addClass('animated bounceOutRight').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
@@ -209,12 +210,12 @@ function quantityClick() {
       label: 'ตกลง',
       action: function(dialog) {
         val = $(dialog.getMessage()).find('input[name=quantity]').val();
-        
+
         var $unit = $tr.find('a[href=#unit]'),
             unit = parseFloat($unit.attr('default')) * parseFloat(val),
             $total = $tr.find('.total'),
             price = parseFloat($tr.find('a[href=#price]').text());
-        
+
         $qty.text(val);
         $unit.text(unit);
         $total.text(price * unit);
@@ -246,16 +247,16 @@ function unitClick() {
       label: 'ตกลง',
       action: function(dialog) {
         val = $(dialog.getMessage()).find('input[name=unit]').val();
-        
+
         var $qty = $tr.find('a[href=#qty]'),
             qty = Math.ceil(parseFloat(val) / parseFloat($unit.attr('default'))),
             $total = $tr.find('.total'),
             price = parseFloat($tr.find('a[href=#price]').text());
-        
+
         $unit.text(val);
         $qty.text(qty);
         $total.text(price * val);
-        
+
         updateSummary();
         dialog.close();
       }
@@ -282,10 +283,10 @@ function priceClick() {
       label: 'ตกลง',
       action: function(dialog) {
         val = $(dialog.getMessage()).find('input[name=price]').val();
-        
+
         var unit = parseFloat($tr.find('a[href=#unit]').text()),
             $total = $tr.find('.total');
-        
+
         $price.text(val);
         $total.text(unit * val);
 
@@ -373,7 +374,7 @@ BootstrapDialog.basket_confirm = function(elm) {
 function numberSwipe(event, direction, distance, duration, fingerCount) {
   var $input = $(event.currentTarget).find('input[type=number]'),
       num = $input.val();
-  
+
   if (direction == 'up') {
     $input.val(++num);
   } else if (direction == 'down') {
