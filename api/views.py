@@ -71,7 +71,7 @@ def get_baskets(request):
 
 
 def create_order(request):
-    obj = json.loads(request.body)
+    obj = json.loads(request.body, parse_float=decimal.Decimal)
     order = Order.objects.create(notation=obj['notation'],
                 person_id=obj['person'], created=datetime.datetime.now())
     for item in obj['order_items']:
@@ -100,7 +100,7 @@ def create_order(request):
 
 
 def edit_order(request, id):
-    obj = json.loads(request.body)
+    obj = json.loads(request.body, parse_float=decimal.Decimal)
     order = get_object_or_404(Order, pk=id)
     before_total = order.total
     import base64
