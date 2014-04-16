@@ -1,6 +1,6 @@
 {% extends 'ipad/base.html' %}
 
-{% load staticfiles %}
+{% load staticfiles humanize %}
 
 {% block content %}
 <div class="order-form-controls row">
@@ -45,7 +45,7 @@
       <td class="name">{{ item.product.name }}</td>
       <td><a default="{{ item.product.unit }}" href="#unit">{{ item.unit|floatformat }}</a></td>
       <td><a default="{{ item.product.price_per_unit }}" href="#price">{{ item.price_per_unit|floatformat }}</a></td>
-      <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
+      <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat|intcomma }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
     </tr>
   {% endfor %}
   {% for item in order.get_deposit_baskets %}
@@ -54,7 +54,7 @@
       <td class="name">{{ item.basket.name }}</td>
       <td><a default="{{ item.basket.unit }}" href="#unit">{{ item.unit|floatformat }}</a></td>
       <td><a default="{{ item.basket.price_per_unit }}" href="#price">{{ item.price_per_unit|floatformat }}</a></td>
-      <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
+      <td><div class="total-wrapper"><span class="total">{{ item.total|floatformat|intcomma }}</span><div class="remove-product-btn-wrapper"><a class="remove-product-btn" href="#remove"><span class="glyphicon glyphicon-remove-circle"></span></a></div></div></td>
     </tr>
   {% endfor %}
   </tbody>
