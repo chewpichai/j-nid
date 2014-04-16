@@ -218,7 +218,7 @@ function quantityClick() {
 
         $qty.text(val);
         $unit.text(unit);
-        $total.text(price * unit);
+        $total.text(CommaFormatted(price * unit));
 
         updateSummary();
         dialog.close();
@@ -255,7 +255,7 @@ function unitClick() {
 
         $unit.text(val);
         $qty.text(qty);
-        $total.text(price * val);
+        $total.text(CommaFormatted(price * val));
 
         updateSummary();
         dialog.close();
@@ -288,7 +288,7 @@ function priceClick() {
             $total = $tr.find('.total');
 
         $price.text(val);
-        $total.text(unit * val);
+        $total.text(CommaFormatted(unit * val));
 
         updateSummary();
         dialog.close();
@@ -315,7 +315,7 @@ function updateSummary() {
     summary += parseFloat($(tr).find('.total').text());
   });
 
-  $td.html(summary + '<br/><br/>' + quantity);
+  $td.html(CommaFormatted(summary) + '<br/><br/>' + CommaFormatted(quantity));
   $('.payment-dialog .summary').html(summary);
   $('.payment-dialog .quantity').html(quantity);
 }
