@@ -86,7 +86,7 @@ function addProduct(elm, is_deposit) {
       unit = default_unit * quantity,
       price_per_unit = parseFloat($(elm).attr('price-per-unit')),
       cost_per_unit = parseFloat($(elm).attr('cost-per-unit')),
-      total = unit * price_per_unit,
+      total = CommaFormatted(unit * price_per_unit),
       $existed_tr = $('.order-form tbody tr[product-id=' + product_id + '][product-type-id=' + product_type_id + ']'),
       output = [];
 
@@ -129,7 +129,7 @@ function addProduct(elm, is_deposit) {
     unit += default_unit;
     $existed_tr.find('a[href=#qty]').text(qty);
     $existed_tr.find('a[href=#unit]').text(unit);
-    $existed_tr.find('.total').text(unit * price);
+    $existed_tr.find('.total').text(CommaFormatted(unit * price));
   } else {
     output.push('<tr product-type-id="' + product_type_id + '" product-id="' + product_id + '" cost-per-unit="' + cost_per_unit + '">');
 
@@ -312,7 +312,7 @@ function updateSummary() {
     if ($(tr).find('a[href=#qty]').length)
       quantity += parseFloat($(tr).find('a[href=#qty]').text());
 
-    summary += parseFloat($(tr).find('.total').text());
+    summary += parseFloat($(tr).find('.total').text().replace(',', ''));
   });
 
   $td.html(CommaFormatted(summary) + '<br/><br/>' + CommaFormatted(quantity));
