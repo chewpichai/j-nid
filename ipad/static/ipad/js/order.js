@@ -57,7 +57,7 @@ function productClick() {
   var product_type_id = $(this).closest('[product-type-id]').attr('product-type-id');
 
   if (product_type_id == 'basket') {
-    BootstrapDialog.basket_confirm(this);
+    BootstrapDialog.basket_confirm($(this));
     return false;
   }
 
@@ -104,12 +104,12 @@ function addProduct(elm, is_deposit) {
 
     if (existed) {
       qty = parseInt(existed[0].split(' x ')[1]);
-      qty++;
+      qty += quantity;
       note_txt = note_txt.replace(existed[0], name + ' x ' + qty);
       $('#id-note').data('baskets')[name]['unit'] = qty;
     } else {
       if (note_txt.length > 0) note_txt += '\n';
-      note_txt += name + ' x 1';
+      note_txt += name + ' x ' + quantity;
       $('#id-note').data('baskets')[name] = basket;
     }
 
@@ -348,25 +348,39 @@ BootstrapDialog.product_confirm = function($elm, $dialog, is_deposit) {
 };
 
 
-BootstrapDialog.basket_confirm = function(elm) {
+BootstrapDialog.basket_confirm = function($elm) {
+  var $dialog = $('.quantity-dialog').clone();
+  $dialog.find('[name=quantity]').val('1');
+
   new BootstrapDialog({
     title: 'ชนิดของตระกร้า',
-    message: '',
+    message: $dialog,
     closable: false,
-    data: {elm: elm},
+    data: {elm: $elm},
     buttons: [{
       label: 'มัดจำ',
       action: function(dialog) {
-        addProduct(dialog.getData('elm'), true);
+        var $elm = dialog.getData('elm'),
+            quantity = $(dialog.getMessage()).find('input[name=quantity]').val();
+
+        $elm.attr('quantity', quantity);
+        addProduct($elm[0], true);
         dialog.close();
       }
     }, {
       label: 'ไม่มัดจำ',
       action: function(dialog) {
-        addProduct(dialog.getData('elm'), false);
+        var $elm = dialog.getData('elm'),
+            quantity = $(dialog.getMessage()).find('input[name=quantity]').val();
+            
+        $elm.attr('quantity', quantity);
+        addProduct($elm[0], false);
         dialog.close();
       }
-    }]
+    }],
+    onshow: function(dialog) {
+      dialog.getModalDialog().swipe({swipe: numberSwipe});
+    }
   }).open();
 };
 
