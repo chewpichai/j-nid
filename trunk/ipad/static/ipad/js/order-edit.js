@@ -5,7 +5,7 @@ $(function() {
   });
 
   $('#order-delete-btn').click(function() {
-    BootstrapDialog.order_delete_confirm(this);    
+    BootstrapDialog.order_delete_confirm(this);
   });
 
   var baskets = eval($('#id-note').data('baskets'));
@@ -40,7 +40,7 @@ function orderSubmitClick() {
           id: $tr.attr('order-item-id'),
           is_basket: $tr.attr('product-type-id') == 'basket',
           price_per_unit: parseFloat($tr.find('a[href=#price]').text()),
-          unit: parseInt($tr.find('a[href=#unit]').text()),
+          unit: parseFloat($tr.find('a[href=#unit]').text()),
           product: $tr.attr('product-id'),
           cost_per_unit: parseFloat($tr.attr('cost-per-unit')),
           is_deposit: true,
