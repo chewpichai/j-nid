@@ -1,0 +1,1 @@
+Sever for j-nid store.
